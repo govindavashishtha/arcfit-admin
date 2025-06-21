@@ -1,48 +1,37 @@
-import React, { useState, useEffect } from 'react';
-import { Building, MapPin, Phone, Search, Calendar, Activity, Plus, Edit2, Trash2 } from 'lucide-react';
+import React, { useState } from 'react';
+import { Building, MapPin, Phone, Search, Plus, Edit2, Trash2 } from 'lucide-react';
 import { Society } from '../types/society';
-import { getAllSocieties, createSociety, updateSociety, deleteSociety } from '../api/societyApi';
+import { 
+  useSocietiesQuery, 
+  useCreateSocietyMutation, 
+  useUpdateSocietyMutation, 
+  useDeleteSocietyMutation 
+} from '../hooks/queries/useSocietyQueries';
 import SocietyForm from '../components/society/SocietyForm';
 
 const SocietyPage: React.FC = () => {
-  const [societies, setSocieties] = useState<Society[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [selectedSociety, setSelectedSociety] = useState<Society | null>(null);
-  const [isDeleting, setIsDeleting] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchSocieties();
-  }, []);
-
-  const fetchSocieties = async () => {
-    try {
-      setIsLoading(true);
-      const response = await getAllSocieties();
-      if (response.success) {
-        setSocieties(response.data);
-      }
-    } catch (err) {
-      setError('Failed to fetch societies');
-      console.error(err);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  // TanStack Query hooks
+  const { 
+    data: societies = [], 
+    isLoading, 
+    error,
+    refetch 
+  } = useSocietiesQuery();
+  
+  const createSocietyMutation = useCreateSocietyMutation();
+  const updateSocietyMutation = useUpdateSocietyMutation();
+  const deleteSocietyMutation = useDeleteSocietyMutation();
 
   const handleCreateSociety = async (data: any) => {
     try {
-      setIsLoading(true);
-      await createSociety(data);
-      await fetchSocieties();
+      await createSocietyMutation.mutateAsync(data);
       setShowForm(false);
-    } catch (err) {
-      setError('Failed to create society');
-      console.error(err);
-    } finally {
-      setIsLoading(false);
+    } catch (error) {
+      console.error('Failed to create society:', error);
     }
   };
 
@@ -50,32 +39,26 @@ const SocietyPage: React.FC = () => {
     if (!selectedSociety) return;
 
     try {
-      setIsLoading(true);
-      await updateSociety({
+      await updateSocietyMutation.mutateAsync({
         society_id: selectedSociety.society_id,
         ...data
       });
-      await fetchSocieties();
       setShowForm(false);
       setSelectedSociety(null);
-    } catch (err) {
-      setError('Failed to update society');
-      console.error(err);
-    } finally {
-      setIsLoading(false);
+    } catch (error) {
+      console.error('Failed to update society:', error);
     }
   };
 
   const handleDeleteSociety = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this society?')) {
+      return;
+    }
+
     try {
-      setIsDeleting(id);
-      await deleteSociety(id);
-      await fetchSocieties();
-    } catch (err) {
-      setError('Failed to delete society');
-      console.error(err);
-    } finally {
-      setIsDeleting(null);
+      await deleteSocietyMutation.mutateAsync(id);
+    } catch (error) {
+      console.error('Failed to delete society:', error);
     }
   };
 
@@ -84,6 +67,8 @@ const SocietyPage: React.FC = () => {
     society.address.toLowerCase().includes(searchQuery.toLowerCase()) ||
     society.city.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const isFormLoading = createSocietyMutation.isPending || updateSocietyMutation.isPending;
 
   if (showForm) {
     return (
@@ -98,7 +83,7 @@ const SocietyPage: React.FC = () => {
             setShowForm(false);
             setSelectedSociety(null);
           }}
-          isLoading={isLoading}
+          isLoading={isFormLoading}
         />
       </div>
     );
@@ -144,12 +129,19 @@ const SocietyPage: React.FC = () => {
           <div className="flex">
             <div className="flex-shrink-0">
               <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-                
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
               </svg>
             </div>
             <div className="ml-3">
-              <p className="text-sm text-red-700">{error}</p>
+              <p className="text-sm text-red-700">
+                {error instanceof Error ? error.message : 'Failed to load societies'}
+              </p>
+              <button 
+                onClick={() => refetch()}
+                className="mt-2 text-sm text-red-600 hover:text-red-800 underline"
+              >
+                Try again
+              </button>
             </div>
           </div>
         </div>
@@ -161,7 +153,7 @@ const SocietyPage: React.FC = () => {
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
           </div>
         ) : filteredSocieties.length > 0 ? (
-          filteredSocieties?.map((society) => (
+          filteredSocieties.map((society) => (
             <div key={society.society_id} className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden hover:shadow-lg transition-shadow">
               <div className="p-6">
                 <div className="flex justify-between items-start mb-4">
@@ -189,7 +181,7 @@ const SocietyPage: React.FC = () => {
                     </button>
                     <button
                       onClick={() => handleDeleteSociety(society.society_id)}
-                      disabled={isDeleting === society.society_id}
+                      disabled={deleteSocietyMutation.isPending}
                       className="p-2 text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 disabled:opacity-50"
                     >
                       <Trash2 className="h-5 w-5" />
