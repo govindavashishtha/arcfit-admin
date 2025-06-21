@@ -1,34 +1,29 @@
 import React, { useState } from 'react';
-import { UserCheck, Search, Filter, ChevronDown } from 'lucide-react';
-
-interface Trainer {
-  id: number;
-  name: string;
-  specialty: string;
-  rating: number;
-  status: 'active' | 'inactive';
-  members: number;
-  joinDate: string;
-}
+import { UserCheck, Search, Filter, ChevronDown, Plus, Edit2, Trash2 } from 'lucide-react';
+import { 
+  useTrainersQuery, 
+  useDeleteTrainerMutation 
+} from '../hooks/queries/useTrainerQueries';
+import { Trainer } from '../api/trainersApi';
 
 const TrainersPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   
-  // Mock data for trainers
-  const trainers: Trainer[] = [
-    { id: 1, name: 'John Smith', specialty: 'Weight Training', rating: 4.8, status: 'active', members: 24, joinDate: '2024-01-15' },
-    { id: 2, name: 'Sarah Johnson', specialty: 'Yoga', rating: 4.9, status: 'active', members: 18, joinDate: '2024-02-03' },
-    { id: 3, name: 'Michael Brown', specialty: 'Cardio', rating: 4.7, status: 'active', members: 15, joinDate: '2024-01-22' },
-    { id: 4, name: 'Emma Davis', specialty: 'CrossFit', rating: 4.6, status: 'inactive', members: 8, joinDate: '2024-03-10' },
-    { id: 5, name: 'Robert Wilson', specialty: 'Nutrition', rating: 4.5, status: 'active', members: 30, joinDate: '2023-11-05' },
-    { id: 6, name: 'Lisa Chen', specialty: 'Pilates', rating: 4.9, status: 'active', members: 22, joinDate: '2024-02-18' },
-    { id: 7, name: 'David Garcia', specialty: 'Boxing', rating: 4.7, status: 'inactive', members: 12, joinDate: '2024-01-30' },
-  ];
+  // TanStack Query hooks
+  const { 
+    data: trainers = [], 
+    isLoading, 
+    error,
+    refetch 
+  } = useTrainersQuery();
+  
+  const deleteTrainerMutation = useDeleteTrainerMutation();
   
   // Filter trainers based on search query and status filter
-  const filteredTrainers = trainers.filter(trainer => {
-    const matchesSearch = trainer.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+  const filteredTrainers = trainers.filter((trainer: Trainer) => {
+    const fullName = `${trainer.first_name} ${trainer.last_name}`;
+    const matchesSearch = fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
                         trainer.specialty.toLowerCase().includes(searchQuery.toLowerCase());
     
     const matchesStatus = statusFilter === 'all' ||
@@ -37,6 +32,18 @@ const TrainersPage: React.FC = () => {
     
     return matchesSearch && matchesStatus;
   });
+
+  const handleDeleteTrainer = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this trainer?')) {
+      return;
+    }
+
+    try {
+      await deleteTrainerMutation.mutateAsync(id);
+    } catch (error) {
+      console.error('Failed to delete trainer:', error);
+    }
+  };
 
   return (
     <div className="animate-fadeIn">
@@ -48,7 +55,8 @@ const TrainersPage: React.FC = () => {
           </p>
         </div>
         <div className="mt-4 md:mt-0">
-          <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+          <button className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+            <Plus className="w-5 h-5 mr-2" />
             Add New Trainer
           </button>
         </div>
@@ -86,6 +94,29 @@ const TrainersPage: React.FC = () => {
         </div>
       </div>
 
+      {error && (
+        <div className="mb-6 bg-red-50 border-l-4 border-red-400 p-4">
+          <div className="flex">
+            <div className="flex-shrink-0">
+              <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div className="ml-3">
+              <p className="text-sm text-red-700">
+                {error instanceof Error ? error.message : 'Failed to load trainers'}
+              </p>
+              <button 
+                onClick={() => refetch()}
+                className="mt-2 text-sm text-red-600 hover:text-red-800 underline"
+              >
+                Try again
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
@@ -115,7 +146,16 @@ const TrainersPage: React.FC = () => {
               </tr>
             </thead>
             <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-              {filteredTrainers.length > 0 ? (
+              {isLoading ? (
+                <tr>
+                  <td colSpan={7} className="px-6 py-4 text-center">
+                    <div className="flex justify-center items-center">
+                      <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+                      <span className="ml-2 text-gray-500 dark:text-gray-400">Loading trainers...</span>
+                    </div>
+                  </td>
+                </tr>
+              ) : filteredTrainers.length > 0 ? (
                 filteredTrainers.map((trainer) => (
                   <tr key={trainer.id} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -124,7 +164,9 @@ const TrainersPage: React.FC = () => {
                           <UserCheck className="h-5 w-5 text-blue-600 dark:text-blue-300" />
                         </div>
                         <div className="ml-4">
-                          <div className="text-sm font-medium text-gray-900 dark:text-white">{trainer.name}</div>
+                          <div className="text-sm font-medium text-gray-900 dark:text-white">
+                            {trainer.first_name} {trainer.last_name}
+                          </div>
                         </div>
                       </div>
                     </td>
@@ -147,17 +189,21 @@ const TrainersPage: React.FC = () => {
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                      {trainer.members}
+                      {trainer.member_count}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                      {new Date(trainer.joinDate).toLocaleDateString()}
+                      {new Date(trainer.join_date).toLocaleDateString()}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <button className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 mr-3">
-                        Edit
+                        <Edit2 className="h-4 w-4" />
                       </button>
-                      <button className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">
-                        Delete
+                      <button 
+                        onClick={() => handleDeleteTrainer(trainer.id)}
+                        disabled={deleteTrainerMutation.isPending}
+                        className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 disabled:opacity-50"
+                      >
+                        <Trash2 className="h-4 w-4" />
                       </button>
                     </td>
                   </tr>

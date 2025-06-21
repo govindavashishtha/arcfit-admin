@@ -1,36 +1,31 @@
 import React, { useState } from 'react';
-import { Users, Search, Filter, ChevronDown } from 'lucide-react';
-
-interface Member {
-  id: number;
-  name: string;
-  email: string;
-  phoneNumber: string;
-  membershipType: string;
-  status: 'active' | 'inactive' | 'pending';
-  joinDate: string;
-}
+import { Users, Search, Filter, ChevronDown, Plus, Edit2, Trash2 } from 'lucide-react';
+import { 
+  useMembersQuery, 
+  useDeleteMemberMutation 
+} from '../hooks/queries/useMemberQueries';
+import { Member } from '../api/membersApi';
 
 const MembersPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   
-  // Mock data for members
-  const members: Member[] = [
-    { id: 1, name: 'Alex Johnson', email: 'alex@example.com', phoneNumber: '+91 98765 43210', membershipType: 'Premium', status: 'active', joinDate: '2024-01-15' },
-    { id: 2, name: 'Priya Sharma', email: 'priya@example.com', phoneNumber: '+91 87654 32109', membershipType: 'Standard', status: 'active', joinDate: '2024-02-03' },
-    { id: 3, name: 'Rahul Patel', email: 'rahul@example.com', phoneNumber: '+91 76543 21098', membershipType: 'Premium', status: 'inactive', joinDate: '2024-01-22' },
-    { id: 4, name: 'Neha Singh', email: 'neha@example.com', phoneNumber: '+91 65432 10987', membershipType: 'Basic', status: 'active', joinDate: '2024-03-10' },
-    { id: 5, name: 'Arjun Kumar', email: 'arjun@example.com', phoneNumber: '+91 54321 09876', membershipType: 'Standard', status: 'pending', joinDate: '2023-11-05' },
-    { id: 6, name: 'Divya Gupta', email: 'divya@example.com', phoneNumber: '+91 43210 98765', membershipType: 'Premium', status: 'active', joinDate: '2024-02-18' },
-    { id: 7, name: 'Vikram Reddy', email: 'vikram@example.com', phoneNumber: '+91 32109 87654', membershipType: 'Basic', status: 'inactive', joinDate: '2024-01-30' },
-  ];
+  // TanStack Query hooks
+  const { 
+    data: members = [], 
+    isLoading, 
+    error,
+    refetch 
+  } = useMembersQuery();
+  
+  const deleteMemberMutation = useDeleteMemberMutation();
   
   // Filter members based on search query and status filter
-  const filteredMembers = members.filter(member => {
-    const matchesSearch = member.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+  const filteredMembers = members.filter((member: Member) => {
+    const fullName = `${member.first_name} ${member.last_name}`;
+    const matchesSearch = fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
                         member.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                        member.phoneNumber.includes(searchQuery);
+                        member.phone_number.includes(searchQuery);
     
     const matchesStatus = statusFilter === 'all' ||
                         (statusFilter === 'active' && member.status === 'active') ||
@@ -39,6 +34,18 @@ const MembersPage: React.FC = () => {
     
     return matchesSearch && matchesStatus;
   });
+
+  const handleDeleteMember = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this member?')) {
+      return;
+    }
+
+    try {
+      await deleteMemberMutation.mutateAsync(id);
+    } catch (error) {
+      console.error('Failed to delete member:', error);
+    }
+  };
 
   // Status badge style helper
   const getStatusBadgeClasses = (status: string) => {
@@ -64,7 +71,8 @@ const MembersPage: React.FC = () => {
           </p>
         </div>
         <div className="mt-4 md:mt-0">
-          <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+          <button className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+            <Plus className="w-5 h-5 mr-2" />
             Add New Member
           </button>
         </div>
@@ -103,6 +111,29 @@ const MembersPage: React.FC = () => {
         </div>
       </div>
 
+      {error && (
+        <div className="mb-6 bg-red-50 border-l-4 border-red-400 p-4">
+          <div className="flex">
+            <div className="flex-shrink-0">
+              <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div className="ml-3">
+              <p className="text-sm text-red-700">
+                {error instanceof Error ? error.message : 'Failed to load members'}
+              </p>
+              <button 
+                onClick={() => refetch()}
+                className="mt-2 text-sm text-red-600 hover:text-red-800 underline"
+              >
+                Try again
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
@@ -129,27 +160,38 @@ const MembersPage: React.FC = () => {
               </tr>
             </thead>
             <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-              {filteredMembers.length > 0 ? (
+              {isLoading ? (
+                <tr>
+                  <td colSpan={6} className="px-6 py-4 text-center">
+                    <div className="flex justify-center items-center">
+                      <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+                      <span className="ml-2 text-gray-500 dark:text-gray-400">Loading members...</span>
+                    </div>
+                  </td>
+                </tr>
+              ) : filteredMembers.length > 0 ? (
                 filteredMembers.map((member) => (
                   <tr key={member.id} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <div className="flex-shrink-0 h-10 w-10 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
                           <span className="font-medium text-blue-800 dark:text-blue-200">
-                            {member.name.split(' ').map(part => part[0]).join('')}
+                            {member.first_name.charAt(0)}{member.last_name.charAt(0)}
                           </span>
                         </div>
                         <div className="ml-4">
-                          <div className="text-sm font-medium text-gray-900 dark:text-white">{member.name}</div>
+                          <div className="text-sm font-medium text-gray-900 dark:text-white">
+                            {member.first_name} {member.last_name}
+                          </div>
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-900 dark:text-white">{member.email}</div>
-                      <div className="text-sm text-gray-500 dark:text-gray-400">{member.phoneNumber}</div>
+                      <div className="text-sm text-gray-500 dark:text-gray-400">{member.phone_number}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900 dark:text-white">{member.membershipType}</div>
+                      <div className="text-sm text-gray-900 dark:text-white">{member.membership_type}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusBadgeClasses(member.status)}`}>
@@ -157,14 +199,18 @@ const MembersPage: React.FC = () => {
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                      {new Date(member.joinDate).toLocaleDateString()}
+                      {new Date(member.join_date).toLocaleDateString()}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <button className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 mr-3">
-                        Edit
+                        <Edit2 className="h-4 w-4" />
                       </button>
-                      <button className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">
-                        Delete
+                      <button 
+                        onClick={() => handleDeleteMember(member.id)}
+                        disabled={deleteMemberMutation.isPending}
+                        className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 disabled:opacity-50"
+                      >
+                        <Trash2 className="h-4 w-4" />
                       </button>
                     </td>
                   </tr>
