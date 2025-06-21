@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Users, Plus, Download, Upload } from 'lucide-react';
 import { useMembersQuery, useDeleteMemberMutation } from '../hooks/queries/useMemberQueries';
-import { Member, MemberFilters, MemberQueryParams } from '../types/member';
+import { Member, MemberFilters as MemberFiltersType, MemberQueryParams } from '../types/member';
 import SocietyPicker from '../components/members/SocietyPicker';
 import MemberFilters from '../components/members/MemberFilters';
 import MembersTable from '../components/members/MembersTable';
@@ -10,7 +10,7 @@ const MembersPage: React.FC = () => {
   const [selectedSocietyId, setSelectedSocietyId] = useState<string>('');
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize] = useState(10);
-  const [filters, setFilters] = useState<MemberFilters>({});
+  const [filters, setFilters] = useState<MemberFiltersType>({});
 
   // Build query parameters
   const queryParams: MemberQueryParams = {
@@ -40,7 +40,7 @@ const MembersPage: React.FC = () => {
     setFilters({}); // Clear filters when society changes
   };
 
-  const handleFiltersChange = (newFilters: MemberFilters) => {
+  const handleFiltersChange = (newFilters: MemberFiltersType) => {
     setFilters(newFilters);
   };
 
