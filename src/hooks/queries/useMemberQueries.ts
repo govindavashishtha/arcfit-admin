@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Member, CreateMemberData, UpdateMemberData } from '../../api/membersApi';
+import { Member, MemberQueryParams } from '../../types/member';
 import { 
   getAllMembers, 
   getMemberById, 
@@ -12,23 +12,24 @@ import {
 export const memberKeys = {
   all: ['members'] as const,
   lists: () => [...memberKeys.all, 'list'] as const,
-  list: (filters: Record<string, any>) => [...memberKeys.lists(), { filters }] as const,
+  list: (params: MemberQueryParams) => [...memberKeys.lists(), params] as const,
   details: () => [...memberKeys.all, 'detail'] as const,
   detail: (id: string) => [...memberKeys.details(), id] as const,
 };
 
-// Get All Members Query
-export const useMembersQuery = (filters?: Record<string, any>) => {
+// Get All Members Query with Pagination and Filters
+export const useMembersQuery = (params?: MemberQueryParams) => {
   return useQuery({
-    queryKey: memberKeys.list(filters || {}),
+    queryKey: memberKeys.list(params || {}),
     queryFn: async () => {
-      const response = await getAllMembers();
+      const response = await getAllMembers(params);
       if (!response.success) {
         throw new Error('Failed to fetch members');
       }
       return response.data;
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
+    enabled: !!params?.society_id, // Only fetch when society is selected
   });
 };
 
@@ -53,7 +54,7 @@ export const useCreateMemberMutation = () => {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: async (data: CreateMemberData) => {
+    mutationFn: async (data: Partial<Member>) => {
       const response = await createMember(data);
       if (!response.success) {
         throw new Error('Failed to create member');
@@ -75,8 +76,8 @@ export const useUpdateMemberMutation = () => {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: async (data: UpdateMemberData) => {
-      const response = await updateMember(data);
+    mutationFn: async ({ id, data }: { id: string; data: Partial<Member> }) => {
+      const response = await updateMember(id, data);
       if (!response.success) {
         throw new Error('Failed to update member');
       }

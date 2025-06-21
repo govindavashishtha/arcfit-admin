@@ -1,35 +1,19 @@
 import api from './authApi';
 import { ApiResponse } from '../types/auth';
+import { Member, PaginatedMembersResponse, MemberQueryParams } from '../types/member';
 
-export interface Member {
-  id: string;
-  user_id: string;
-  first_name: string;
-  last_name: string;
-  email: string;
-  phone_number: string;
-  membership_type: string;
-  status: 'active' | 'inactive' | 'pending';
-  join_date: string;
-  created_at: string;
-  updated_at: string;
-}
+export const getAllMembers = async (params?: MemberQueryParams): Promise<ApiResponse<PaginatedMembersResponse>> => {
+  const queryParams = new URLSearchParams();
+  
+  if (params?.page) queryParams.append('page', params.page.toString());
+  if (params?.limit) queryParams.append('limit', params.limit.toString());
+  if (params?.society_id) queryParams.append('society_id', params.society_id);
+  if (params?.status) queryParams.append('status', params.status);
+  if (params?.gender) queryParams.append('gender', params.gender);
+  if (params?.verification_status) queryParams.append('verification_status', params.verification_status);
+  if (params?.search) queryParams.append('search', params.search);
 
-export interface CreateMemberData {
-  first_name: string;
-  last_name: string;
-  email: string;
-  phone_number: string;
-  membership_type: string;
-  status: 'active' | 'inactive' | 'pending';
-}
-
-export interface UpdateMemberData extends Partial<CreateMemberData> {
-  id: string;
-}
-
-export const getAllMembers = async (): Promise<ApiResponse<Member[]>> => {
-  const response = await api.get<ApiResponse<Member[]>>('/api/members');
+  const response = await api.get<ApiResponse<PaginatedMembersResponse>>(`/api/members?${queryParams.toString()}`);
   return response.data;
 };
 
@@ -38,14 +22,13 @@ export const getMemberById = async (id: string): Promise<ApiResponse<Member>> =>
   return response.data;
 };
 
-export const createMember = async (data: CreateMemberData): Promise<ApiResponse<Member>> => {
+export const createMember = async (data: Partial<Member>): Promise<ApiResponse<Member>> => {
   const response = await api.post<ApiResponse<Member>>('/api/members', data);
   return response.data;
 };
 
-export const updateMember = async (data: UpdateMemberData): Promise<ApiResponse<Member>> => {
-  const { id, ...updateData } = data;
-  const response = await api.put<ApiResponse<Member>>(`/api/members/${id}`, updateData);
+export const updateMember = async (id: string, data: Partial<Member>): Promise<ApiResponse<Member>> => {
+  const response = await api.put<ApiResponse<Member>>(`/api/members/${id}`, data);
   return response.data;
 };
 
