@@ -84,6 +84,8 @@ const MembersPage: React.FC = () => {
           </p>
         </div>
         
+        {/* Commented out Add Member Button */}
+        {/* 
         <div className="mt-4 lg:mt-0">
           <button
             onClick={handleAddMember}
@@ -94,6 +96,7 @@ const MembersPage: React.FC = () => {
             Add Member
           </button>
         </div>
+        */}
       </div>
 
       {/* Society Picker */}
