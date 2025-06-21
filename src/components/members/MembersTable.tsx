@@ -165,6 +165,8 @@ const MembersTable: React.FC<MembersTableProps> = ({
         </div>
       ),
     }),
+    // Commented out Actions column
+    /*
     columnHelper.display({
       id: 'actions',
       header: 'Actions',
@@ -191,6 +193,7 @@ const MembersTable: React.FC<MembersTableProps> = ({
         </div>
       ),
     }),
+    */
   ], [onEdit, onDelete]);
 
   const table = useReactTable({
