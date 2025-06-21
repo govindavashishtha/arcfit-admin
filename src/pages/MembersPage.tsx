@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Users, Plus, Download, Upload } from 'lucide-react';
+import { Users, Plus } from 'lucide-react';
 import { useMembersQuery, useDeleteMemberMutation } from '../hooks/queries/useMemberQueries';
 import { Member, MemberFilters as MemberFiltersType, MemberQueryParams } from '../types/member';
 import SocietyPicker from '../components/members/SocietyPicker';
@@ -65,14 +65,9 @@ const MembersPage: React.FC = () => {
     }
   };
 
-  const handleExportMembers = () => {
-    // TODO: Implement export functionality
-    console.log('Export members for society:', selectedSocietyId);
-  };
-
-  const handleImportMembers = () => {
-    // TODO: Implement import functionality
-    console.log('Import members for society:', selectedSocietyId);
+  const handleAddMember = () => {
+    // TODO: Implement add member functionality
+    console.log('Add member for society:', selectedSocietyId);
   };
 
   return (
@@ -89,24 +84,9 @@ const MembersPage: React.FC = () => {
           </p>
         </div>
         
-        <div className="mt-4 lg:mt-0 flex space-x-3">
+        <div className="mt-4 lg:mt-0">
           <button
-            onClick={handleImportMembers}
-            disabled={!selectedSocietyId}
-            className="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <Upload className="h-4 w-4 mr-2" />
-            Import
-          </button>
-          <button
-            onClick={handleExportMembers}
-            disabled={!selectedSocietyId || !membersData?.data.length}
-            className="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <Download className="h-4 w-4 mr-2" />
-            Export
-          </button>
-          <button
+            onClick={handleAddMember}
             disabled={!selectedSocietyId}
             className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
           >
