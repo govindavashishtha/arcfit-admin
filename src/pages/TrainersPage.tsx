@@ -1,14 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { UserCheck, Plus } from 'lucide-react';
-import { useTrainersQuery, useDeleteTrainerMutation } from '../hooks/queries/useTrainerQueries';
-import { Trainer, TrainerFilters as TrainerFiltersType, TrainerQueryParams } from '../types/trainer';
+import { useTrainersQuery, useDeleteTrainerMutation, useCreateTrainerMutation } from '../hooks/queries/useTrainerQueries';
+import { Trainer, TrainerFilters as TrainerFiltersType, TrainerQueryParams, CreateTrainerData } from '../types/trainer';
 import TrainerFilters from '../components/trainers/TrainerFilters';
 import TrainersTable from '../components/trainers/TrainersTable';
+import TrainerForm from '../components/trainers/TrainerForm';
+import toast from 'react-hot-toast';
 
 const TrainersPage: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [filters, setFilters] = useState<TrainerFiltersType>({});
+  const [showForm, setShowForm] = useState(false);
+  const [selectedTrainer, setSelectedTrainer] = useState<Trainer | null>(null);
 
   // Build query parameters
   const queryParams: TrainerQueryParams = {
@@ -26,6 +30,7 @@ const TrainersPage: React.FC = () => {
   } = useTrainersQuery(queryParams);
   
   const deleteTrainerMutation = useDeleteTrainerMutation();
+  const createTrainerMutation = useCreateTrainerMutation();
 
   // Reset page when filters change
   useEffect(() => {
@@ -41,8 +46,8 @@ const TrainersPage: React.FC = () => {
   };
 
   const handleEditTrainer = (trainer: Trainer) => {
-    // TODO: Implement edit functionality
-    console.log('Edit trainer:', trainer);
+    setSelectedTrainer(trainer);
+    setShowForm(true);
   };
 
   const handleDeleteTrainer = async (trainerId: string) => {
@@ -52,20 +57,71 @@ const TrainersPage: React.FC = () => {
 
     try {
       await deleteTrainerMutation.mutateAsync(trainerId);
+      toast.success('Trainer deleted successfully');
     } catch (error) {
       console.error('Failed to delete trainer:', error);
+      toast.error('Failed to delete trainer');
     }
   };
 
   const handleAddTrainer = () => {
-    // TODO: Implement add trainer functionality
-    console.log('Add trainer');
+    setSelectedTrainer(null);
+    setShowForm(true);
+  };
+
+  const handleCreateTrainer = async (data: CreateTrainerData) => {
+    try {
+      await createTrainerMutation.mutateAsync(data);
+      toast.success('Trainer created successfully!');
+      setShowForm(false);
+      setSelectedTrainer(null);
+    } catch (error) {
+      console.error('Failed to create trainer:', error);
+      toast.error('Failed to create trainer');
+      throw error; // Re-throw to let the form handle it
+    }
+  };
+
+  const handleUpdateTrainer = async (data: CreateTrainerData) => {
+    if (!selectedTrainer) return;
+
+    try {
+      // TODO: Implement update functionality
+      console.log('Update trainer:', { id: selectedTrainer.id, ...data });
+      toast.success('Trainer updated successfully!');
+      setShowForm(false);
+      setSelectedTrainer(null);
+    } catch (error) {
+      console.error('Failed to update trainer:', error);
+      toast.error('Failed to update trainer');
+      throw error;
+    }
   };
 
   const handlePageSizeChange = (newPageSize: number) => {
     setPageSize(newPageSize);
     setCurrentPage(1);
   };
+
+  const handleCancelForm = () => {
+    setShowForm(false);
+    setSelectedTrainer(null);
+  };
+
+  const isFormLoading = createTrainerMutation.isPending;
+
+  if (showForm) {
+    return (
+      <div className="space-y-6">
+        <TrainerForm
+          initialData={selectedTrainer || undefined}
+          onSubmit={selectedTrainer ? handleUpdateTrainer : handleCreateTrainer}
+          onCancel={handleCancelForm}
+          isLoading={isFormLoading}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -81,8 +137,6 @@ const TrainersPage: React.FC = () => {
           </p>
         </div>
         
-        {/* Commented out Add Trainer Button */}
-        {/* 
         <div className="mt-4 lg:mt-0">
           <button
             onClick={handleAddTrainer}
@@ -92,7 +146,6 @@ const TrainersPage: React.FC = () => {
             Add Trainer
           </button>
         </div>
-        */}
       </div>
 
       {/* Stats Cards */}

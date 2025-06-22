@@ -11,6 +11,7 @@ import DashboardLayout from './components/layout/DashboardLayout';
 import AuthRoute from './components/routes/AuthRoute';
 import ProtectedRoute from './components/routes/ProtectedRoute';
 import NotFoundPage from './pages/NotFoundPage';
+import Toast from './components/ui/Toast';
 
 function App() {
   return (
@@ -40,6 +41,7 @@ function App() {
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </Router>
+        <Toast />
       </AuthProvider>
     </QueryProvider>
   );
