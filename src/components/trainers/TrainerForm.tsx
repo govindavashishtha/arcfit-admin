@@ -150,7 +150,8 @@ const TrainerForm: React.FC<TrainerFormProps> = ({
         ...formData,
         dob: `${formData.dob}T00:00:00Z`, // Convert to ISO format
         phone_number: formData.phone_number.startsWith('+') ? formData.phone_number : `+91${formData.phone_number}`,
-        experience_in_years: Number(formData.experience_in_years) // Ensure it's a number
+        experience_in_years: Number(formData.experience_in_years), // Ensure it's a number
+        certifications: formData.certifications // Already an array of strings
       };
 
       await onSubmit(submitData);
