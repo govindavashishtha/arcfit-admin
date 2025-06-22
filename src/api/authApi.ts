@@ -1,13 +1,11 @@
 import axios from 'axios';
 import { LoginCredentials, ApiResponse, LoginResponse, RefreshTokenResponse, User } from '../types/auth';
 import { getAccessToken, getRefreshToken } from '../utils/tokenStorage';
-
-// Base URL for the API
-const BASE_URL = 'https://arcfit-services-dev.arcfit.co.in'; // Replace with your actual API base URL
+import { config } from '../config/environment';
 
 // Create an axios instance with default configuration
 const api = axios.create({
-  baseURL: BASE_URL,
+  baseURL: config.apiBaseUrl,
   headers: {
     'Content-Type': 'application/json',
   },

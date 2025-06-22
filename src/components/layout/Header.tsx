@@ -1,6 +1,7 @@
 import React from 'react';
 import { LogOut, Bell, Sun, Moon } from 'lucide-react';
 import useAuth from '../../hooks/useAuth';
+import { config } from '../../config/environment';
 
 interface HeaderProps {
   toggleDarkMode: () => void;
@@ -17,7 +18,16 @@ const Header: React.FC<HeaderProps> = ({ toggleDarkMode, darkMode }) => {
   return (
     <header className="bg-white dark:bg-gray-800 shadow-sm px-6 py-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold text-gray-800 dark:text-white">Welcome, {user?.first_name || 'Admin'}</h1>
+        <div className="flex items-center space-x-4">
+          <h1 className="text-xl font-semibold text-gray-800 dark:text-white">
+            Welcome, {user?.first_name || 'Admin'}
+          </h1>
+          {config.isDevelopment && (
+            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
+              DEV
+            </span>
+          )}
+        </div>
         
         <div className="flex items-center space-x-4">
           <button 
