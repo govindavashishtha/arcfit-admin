@@ -43,17 +43,17 @@ const CreateMembershipForm: React.FC<CreateMembershipFormProps> = ({
 
   // Fetch members for selected society
   const { data: membersData, isLoading: membersLoading } = useMembersQuery(
-    selectedSocietyId ? { society_id: selectedSocietyId } : undefined
+    selectedSocietyId ? { society_id: selectedSocietyId, page:1, limit:1000 } : undefined
   );
 
   const selectedSociety = societies.find(s => s.society_id === selectedSocietyId);
 
   const membershipTypes = [
-    { value: '15D', label: '15 Days', defaultPrice: 500 },
-    { value: '1M', label: '1 Month', defaultPrice: 1500 },
-    { value: '3M', label: '3 Months', defaultPrice: 4000 },
-    { value: '6M', label: '6 Months', defaultPrice: 7500 },
-    { value: '12M', label: '12 Months', defaultPrice: 14000 },
+    { value: '15D', label: '15 Days', defaultPrice: 1799 },
+    { value: '1M', label: '1 Month', defaultPrice: 2999 },
+    { value: '3M', label: '3 Months', defaultPrice: 7500 },
+    { value: '6M', label: '6 Months', defaultPrice: 12000 },
+    { value: '12M', label: '12 Months', defaultPrice: 18000 },
   ];
 
   const paymentMethods = [
