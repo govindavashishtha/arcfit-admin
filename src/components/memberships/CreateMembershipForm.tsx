@@ -7,7 +7,7 @@ import {
   User, 
   CreditCard, 
   Calendar, 
-  DollarSign,
+  IndianRupee,
   Building,
   Clock,
   Pause,
@@ -292,7 +292,7 @@ const CreateMembershipForm: React.FC<CreateMembershipFormProps> = ({
         {/* Payment Information */}
         <div className="space-y-4">
           <h3 className="text-lg font-medium text-gray-900 dark:text-white flex items-center">
-            <DollarSign className="h-5 w-5 mr-2" />
+            <IndianRupee className="h-5 w-5 mr-2" />
             Payment Information
           </h3>
           
@@ -303,7 +303,7 @@ const CreateMembershipForm: React.FC<CreateMembershipFormProps> = ({
               </label>
               <div className="mt-1 relative rounded-md shadow-sm">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <DollarSign className="h-5 w-5 text-gray-400" />
+                  <span className="text-gray-500 dark:text-gray-400 text-sm">₹</span>
                 </div>
                 <input
                   type="number"
@@ -313,7 +313,7 @@ const CreateMembershipForm: React.FC<CreateMembershipFormProps> = ({
                   required
                   min="1"
                   step="0.01"
-                  className="pl-10 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                  className="pl-8 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
                 />
               </div>
             </div>
