@@ -1,37 +1,24 @@
 import api from './authApi';
 import { ApiResponse } from '../types/auth';
+import { 
+  Trainer, 
+  PaginatedTrainersResponse, 
+  TrainerQueryParams, 
+  CreateTrainerData, 
+  UpdateTrainerData 
+} from '../types/trainer';
 
-export interface Trainer {
-  id: string;
-  user_id: string;
-  first_name: string;
-  last_name: string;
-  email: string;
-  phone_number: string;
-  specialty: string;
-  rating: number;
-  status: 'active' | 'inactive';
-  member_count: number;
-  join_date: string;
-  created_at: string;
-  updated_at: string;
-}
+export const getAllTrainers = async (params?: TrainerQueryParams): Promise<ApiResponse<PaginatedTrainersResponse>> => {
+  const queryParams = new URLSearchParams();
+  
+  if (params?.page) queryParams.append('page', params.page.toString());
+  if (params?.limit) queryParams.append('limit', params.limit.toString());
+  if (params?.specialization) queryParams.append('specialization', params.specialization);
+  if (params?.status) queryParams.append('status', params.status);
+  if (params?.society_id) queryParams.append('society_id', params.society_id);
+  if (params?.search) queryParams.append('search', params.search);
 
-export interface CreateTrainerData {
-  first_name: string;
-  last_name: string;
-  email: string;
-  phone_number: string;
-  specialty: string;
-  status: 'active' | 'inactive';
-}
-
-export interface UpdateTrainerData extends Partial<CreateTrainerData> {
-  id: string;
-}
-
-export const getAllTrainers = async (): Promise<ApiResponse<Trainer[]>> => {
-  const response = await api.get<ApiResponse<Trainer[]>>('/api/trainers');
+  const response = await api.get<ApiResponse<PaginatedTrainersResponse>>(`/api/trainers?${queryParams.toString()}`);
   return response.data;
 };
 

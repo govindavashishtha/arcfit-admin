@@ -1,101 +1,180 @@
-import React, { useState } from 'react';
-import { UserCheck, Search, Filter, ChevronDown, Plus, Edit2, Trash2 } from 'lucide-react';
-import { 
-  useTrainersQuery, 
-  useDeleteTrainerMutation 
-} from '../hooks/queries/useTrainerQueries';
-import { Trainer } from '../api/trainersApi';
+import React, { useState, useEffect } from 'react';
+import { UserCheck, Plus } from 'lucide-react';
+import { useTrainersQuery, useDeleteTrainerMutation } from '../hooks/queries/useTrainerQueries';
+import { Trainer, TrainerFilters as TrainerFiltersType, TrainerQueryParams } from '../types/trainer';
+import TrainerFilters from '../components/trainers/TrainerFilters';
+import TrainersTable from '../components/trainers/TrainersTable';
 
 const TrainersPage: React.FC = () => {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState<string>('all');
-  
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [filters, setFilters] = useState<TrainerFiltersType>({});
+
+  // Build query parameters
+  const queryParams: TrainerQueryParams = {
+    page: currentPage,
+    limit: pageSize,
+    ...filters
+  };
+
   // TanStack Query hooks
   const { 
-    data: trainers = [], 
+    data: trainersData, 
     isLoading, 
     error,
     refetch 
-  } = useTrainersQuery();
+  } = useTrainersQuery(queryParams);
   
   const deleteTrainerMutation = useDeleteTrainerMutation();
-  
-  // Filter trainers based on search query and status filter
-  const filteredTrainers = trainers.filter((trainer: Trainer) => {
-    const fullName = `${trainer.first_name} ${trainer.last_name}`;
-    const matchesSearch = fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                        trainer.specialty.toLowerCase().includes(searchQuery.toLowerCase());
-    
-    const matchesStatus = statusFilter === 'all' ||
-                        (statusFilter === 'active' && trainer.status === 'active') ||
-                        (statusFilter === 'inactive' && trainer.status === 'inactive');
-    
-    return matchesSearch && matchesStatus;
-  });
 
-  const handleDeleteTrainer = async (id: string) => {
+  // Reset page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filters]);
+
+  const handleFiltersChange = (newFilters: TrainerFiltersType) => {
+    setFilters(newFilters);
+  };
+
+  const handleClearFilters = () => {
+    setFilters({});
+  };
+
+  const handleEditTrainer = (trainer: Trainer) => {
+    // TODO: Implement edit functionality
+    console.log('Edit trainer:', trainer);
+  };
+
+  const handleDeleteTrainer = async (trainerId: string) => {
     if (!confirm('Are you sure you want to delete this trainer?')) {
       return;
     }
 
     try {
-      await deleteTrainerMutation.mutateAsync(id);
+      await deleteTrainerMutation.mutateAsync(trainerId);
     } catch (error) {
       console.error('Failed to delete trainer:', error);
     }
   };
 
+  const handleAddTrainer = () => {
+    // TODO: Implement add trainer functionality
+    console.log('Add trainer');
+  };
+
+  const handlePageSizeChange = (newPageSize: number) => {
+    setPageSize(newPageSize);
+    setCurrentPage(1);
+  };
+
   return (
-    <div className="animate-fadeIn">
-      <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between">
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Trainers</h1>
-          <p className="text-gray-600 dark:text-gray-300">
-            Manage and monitor your fitness trainers
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center">
+            <UserCheck className="h-8 w-8 mr-3 text-green-600" />
+            Trainers Management
+          </h1>
+          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            Manage and monitor fitness trainers across all societies
           </p>
         </div>
-        <div className="mt-4 md:mt-0">
-          <button className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
-            <Plus className="w-5 h-5 mr-2" />
-            Add New Trainer
+        
+        {/* Commented out Add Trainer Button */}
+        {/* 
+        <div className="mt-4 lg:mt-0">
+          <button
+            onClick={handleAddTrainer}
+            className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Add Trainer
           </button>
         </div>
+        */}
       </div>
 
-      <div className="mb-6 bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-        <div className="flex flex-col md:flex-row md:items-center gap-4">
-          <div className="relative flex-grow">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <Search className="h-5 w-5 text-gray-400" />
+      {/* Stats Cards */}
+      {trainersData && (
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <UserCheck className="h-8 w-8 text-green-600" />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Total Trainers</p>
+                <p className="text-2xl font-semibold text-gray-900 dark:text-white">
+                  {trainersData.pagination.total}
+                </p>
+              </div>
             </div>
-            <input
-              type="text"
-              placeholder="Search trainers..."
-              className="pl-10 pr-4 py-2 w-full border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
           </div>
-          <div className="relative">
-            <label className="inline-flex items-center space-x-2">
-              <Filter className="h-5 w-5 text-gray-500 dark:text-gray-400" />
-              <span className="text-gray-700 dark:text-gray-300">Status:</span>
-            </label>
-            <select
-              className="ml-2 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-            >
-              <option value="all">All</option>
-              <option value="active">Active</option>
-              <option value="inactive">Inactive</option>
-            </select>
+          
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <div className="h-8 w-8 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center">
+                  <div className="h-4 w-4 bg-green-600 rounded-full"></div>
+                </div>
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Active Trainers</p>
+                <p className="text-2xl font-semibold text-gray-900 dark:text-white">
+                  {trainersData.data.filter(t => t.status === 'active').length}
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <div className="h-8 w-8 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
+                  <div className="h-4 w-4 bg-blue-600 rounded-full"></div>
+                </div>
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Specializations</p>
+                <p className="text-2xl font-semibold text-gray-900 dark:text-white">
+                  {new Set(trainersData.data.flatMap(t => t.specialisations)).size}
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <div className="h-8 w-8 bg-purple-100 dark:bg-purple-900 rounded-full flex items-center justify-center">
+                  <div className="h-4 w-4 bg-purple-600 rounded-full"></div>
+                </div>
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Avg Experience</p>
+                <p className="text-2xl font-semibold text-gray-900 dark:text-white">
+                  {trainersData.data.length > 0 
+                    ? Math.round(trainersData.data.reduce((sum, t) => sum + t.experience_in_years, 0) / trainersData.data.length)
+                    : 0
+                  } yrs
+                </p>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
+      {/* Filters */}
+      <TrainerFilters
+        filters={filters}
+        onFiltersChange={handleFiltersChange}
+        onClearFilters={handleClearFilters}
+      />
+
+      {/* Error State */}
       {error && (
-        <div className="mb-6 bg-red-50 border-l-4 border-red-400 p-4">
+        <div className="bg-red-50 dark:bg-red-900/20 border-l-4 border-red-400 p-4">
           <div className="flex">
             <div className="flex-shrink-0">
               <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
@@ -103,12 +182,12 @@ const TrainersPage: React.FC = () => {
               </svg>
             </div>
             <div className="ml-3">
-              <p className="text-sm text-red-700">
+              <p className="text-sm text-red-700 dark:text-red-200">
                 {error instanceof Error ? error.message : 'Failed to load trainers'}
               </p>
               <button 
                 onClick={() => refetch()}
-                className="mt-2 text-sm text-red-600 hover:text-red-800 underline"
+                className="mt-2 text-sm text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-200 underline"
               >
                 Try again
               </button>
@@ -117,141 +196,92 @@ const TrainersPage: React.FC = () => {
         </div>
       )}
 
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-            <thead className="bg-gray-50 dark:bg-gray-900">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Trainer
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Specialty
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Rating
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Status
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Members
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Join Date
-                </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-              {isLoading ? (
-                <tr>
-                  <td colSpan={7} className="px-6 py-4 text-center">
-                    <div className="flex justify-center items-center">
-                      <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
-                      <span className="ml-2 text-gray-500 dark:text-gray-400">Loading trainers...</span>
-                    </div>
-                  </td>
-                </tr>
-              ) : filteredTrainers.length > 0 ? (
-                filteredTrainers.map((trainer) => (
-                  <tr key={trainer.id} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <div className="flex-shrink-0 h-10 w-10 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
-                          <UserCheck className="h-5 w-5 text-blue-600 dark:text-blue-300" />
-                        </div>
-                        <div className="ml-4">
-                          <div className="text-sm font-medium text-gray-900 dark:text-white">
-                            {trainer.first_name} {trainer.last_name}
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900 dark:text-white">{trainer.specialty}</div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <div className="text-sm text-gray-900 dark:text-white">{trainer.rating}</div>
-                        <div className="ml-1 text-yellow-400">★</div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        trainer.status === 'active' 
-                          ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' 
-                          : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
-                      }`}>
-                        {trainer.status}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                      {trainer.member_count}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                      {new Date(trainer.join_date).toLocaleDateString()}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <button className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 mr-3">
-                        <Edit2 className="h-4 w-4" />
-                      </button>
-                      <button 
-                        onClick={() => handleDeleteTrainer(trainer.id)}
-                        disabled={deleteTrainerMutation.isPending}
-                        className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 disabled:opacity-50"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={7} className="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
-                    No trainers found matching your search criteria.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-        <div className="bg-gray-50 dark:bg-gray-900 px-4 py-3 flex items-center justify-between border-t border-gray-200 dark:border-gray-700">
+      {/* Trainers Table */}
+      <TrainersTable
+        data={trainersData?.data || []}
+        isLoading={isLoading}
+        onEdit={handleEditTrainer}
+        onDelete={handleDeleteTrainer}
+      />
+
+      {/* Server-side Pagination */}
+      {trainersData && trainersData.pagination.pages > 1 && (
+        <div className="bg-white dark:bg-gray-800 px-4 py-3 flex items-center justify-between border-t border-gray-200 dark:border-gray-700 rounded-lg shadow">
           <div className="flex-1 flex justify-between sm:hidden">
-            <button className="relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700">
+            <button
+              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+              className="relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
               Previous
             </button>
-            <button className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700">
+            <button
+              onClick={() => setCurrentPage(prev => Math.min(prev + 1, trainersData.pagination.pages))}
+              disabled={currentPage === trainersData.pagination.pages}
+              className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
               Next
             </button>
           </div>
           <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-            <div>
+            <div className="flex items-center space-x-4">
               <p className="text-sm text-gray-700 dark:text-gray-300">
-                Showing <span className="font-medium">1</span> to <span className="font-medium">{filteredTrainers.length}</span> of{' '}
-                <span className="font-medium">{filteredTrainers.length}</span> results
+                Showing page <span className="font-medium">{currentPage}</span> of{' '}
+                <span className="font-medium">{trainersData.pagination.pages}</span> ({trainersData.pagination.total} total trainers)
               </p>
+              <div className="flex items-center space-x-2">
+                <label className="text-sm text-gray-700 dark:text-gray-300">Show:</label>
+                <select
+                  value={pageSize}
+                  onChange={(e) => handlePageSizeChange(Number(e.target.value))}
+                  className="border border-gray-300 dark:border-gray-600 rounded-md px-2 py-1 text-sm dark:bg-gray-700 dark:text-white"
+                >
+                  <option value={5}>5</option>
+                  <option value={10}>10</option>
+                  <option value={25}>25</option>
+                  <option value={50}>50</option>
+                </select>
+                <span className="text-sm text-gray-700 dark:text-gray-300">per page</span>
+              </div>
             </div>
             <div>
-              <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-                <button className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700">
-                  <span className="sr-only">Previous</span>
-                  <ChevronDown className="h-5 w-5 transform rotate-90" />
+              <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
+                <button
+                  onClick={() => setCurrentPage(1)}
+                  disabled={currentPage === 1}
+                  className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  First
                 </button>
-                <button className="relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
-                  1
+                <button
+                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}
+                  className="relative inline-flex items-center px-2 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Previous
                 </button>
-                <button className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700">
-                  <span className="sr-only">Next</span>
-                  <ChevronDown className="h-5 w-5 transform -rotate-90" />
+                <span className="relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm font-medium text-gray-700 dark:text-gray-300">
+                  {currentPage} / {trainersData.pagination.pages}
+                </span>
+                <button
+                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, trainersData.pagination.pages))}
+                  disabled={currentPage === trainersData.pagination.pages}
+                  className="relative inline-flex items-center px-2 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Next
+                </button>
+                <button
+                  onClick={() => setCurrentPage(trainersData.pagination.pages)}
+                  disabled={currentPage === trainersData.pagination.pages}
+                  className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Last
                 </button>
               </nav>
             </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

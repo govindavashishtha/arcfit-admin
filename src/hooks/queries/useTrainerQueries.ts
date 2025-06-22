@@ -1,5 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Trainer, CreateTrainerData, UpdateTrainerData } from '../../api/trainersApi';
+import { 
+  Trainer, 
+  CreateTrainerData, 
+  UpdateTrainerData, 
+  TrainerQueryParams 
+} from '../../types/trainer';
 import { 
   getAllTrainers, 
   getTrainerById, 
@@ -12,17 +17,17 @@ import {
 export const trainerKeys = {
   all: ['trainers'] as const,
   lists: () => [...trainerKeys.all, 'list'] as const,
-  list: (filters: Record<string, any>) => [...trainerKeys.lists(), { filters }] as const,
+  list: (params: TrainerQueryParams) => [...trainerKeys.lists(), params] as const,
   details: () => [...trainerKeys.all, 'detail'] as const,
   detail: (id: string) => [...trainerKeys.details(), id] as const,
 };
 
-// Get All Trainers Query
-export const useTrainersQuery = (filters?: Record<string, any>) => {
+// Get All Trainers Query with Pagination and Filters
+export const useTrainersQuery = (params?: TrainerQueryParams) => {
   return useQuery({
-    queryKey: trainerKeys.list(filters || {}),
+    queryKey: trainerKeys.list(params || {}),
     queryFn: async () => {
-      const response = await getAllTrainers();
+      const response = await getAllTrainers(params);
       if (!response.success) {
         throw new Error('Failed to fetch trainers');
       }
@@ -84,7 +89,7 @@ export const useUpdateTrainerMutation = () => {
     },
     onSuccess: (data, variables) => {
       // Update the specific trainer in cache
-      queryClient.setQueryData(trainerKeys.detail(variables.id), data);
+      queryClient.setQueryData(trainerKeys.detail(variables.id.toString()), data);
       
       // Invalidate and refetch trainers list
       queryClient.invalidateQueries({ queryKey: trainerKeys.lists() });
