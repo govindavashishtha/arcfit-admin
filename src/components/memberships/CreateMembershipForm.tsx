@@ -2,32 +2,33 @@ import React, { useState, useEffect } from 'react';
 import { CreateMembershipData } from '../../types/membership';
 import { useMembersQuery } from '../../hooks/queries/useMemberQueries';
 import { useSocietiesQuery } from '../../hooks/queries/useSocietyQueries';
+import MemberSearchSelect from './MemberSearchSelect';
 import { 
   User, 
   CreditCard, 
   Calendar, 
   DollarSign,
   Building,
-  X,
-  Check,
   Clock,
-  Pause
+  Pause,
+  ArrowLeft
 } from 'lucide-react';
 
 interface CreateMembershipFormProps {
+  selectedSocietyId: string;
   onSubmit: (data: CreateMembershipData) => Promise<void>;
   onCancel: () => void;
   isLoading: boolean;
 }
 
 const CreateMembershipForm: React.FC<CreateMembershipFormProps> = ({
+  selectedSocietyId,
   onSubmit,
   onCancel,
   isLoading
 }) => {
   const { data: societies = [] } = useSocietiesQuery();
   
-  const [selectedSocietyId, setSelectedSocietyId] = useState<string>('');
   const [formData, setFormData] = useState<CreateMembershipData>({
     user_id: '',
     type: '1M',
@@ -41,9 +42,11 @@ const CreateMembershipForm: React.FC<CreateMembershipFormProps> = ({
   const [error, setError] = useState<string>('');
 
   // Fetch members for selected society
-  const { data: membersData } = useMembersQuery(
+  const { data: membersData, isLoading: membersLoading } = useMembersQuery(
     selectedSocietyId ? { society_id: selectedSocietyId, limit: 1000 } : undefined
   );
+
+  const selectedSociety = societies.find(s => s.society_id === selectedSocietyId);
 
   const membershipTypes = [
     { value: '15D', label: '15 Days', defaultPrice: 500 },
@@ -100,7 +103,7 @@ const CreateMembershipForm: React.FC<CreateMembershipFormProps> = ({
   useEffect(() => {
     // Update default price based on membership type
     const selectedType = membershipTypes.find(type => type.value === formData.type);
-    if (selectedType && formData.payment_amount === 0) {
+    if (selectedType) {
       setFormData(prev => ({
         ...prev,
         payment_amount: selectedType.defaultPrice
@@ -118,13 +121,17 @@ const CreateMembershipForm: React.FC<CreateMembershipFormProps> = ({
     }
   };
 
+  const handleMemberSelect = (userId: string) => {
+    setFormData(prev => ({ ...prev, user_id: userId }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
     // Validation
     if (!selectedSocietyId) {
-      setError('Please select a society');
+      setError('Society is required');
       return;
     }
 
@@ -148,68 +155,61 @@ const CreateMembershipForm: React.FC<CreateMembershipFormProps> = ({
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg">
       <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-          Create New Membership
-        </h2>
-        <p className="text-sm text-gray-500 dark:text-gray-400">
-          Add a new membership for a society member
-        </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+              Create New Membership
+            </h2>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Add a new membership for {selectedSociety?.name}
+            </p>
+          </div>
+          <button
+            onClick={onCancel}
+            className="flex items-center text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+          >
+            <ArrowLeft className="h-4 w-4 mr-1" />
+            Back to Society Selection
+          </button>
+        </div>
       </div>
 
       <form onSubmit={handleSubmit} className="p-6 space-y-6">
-        {/* Society Selection */}
-        <div className="space-y-4">
-          <h3 className="text-lg font-medium text-gray-900 dark:text-white flex items-center">
-            <Building className="h-5 w-5 mr-2" />
-            Society & Member Selection
-          </h3>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Society Info */}
+        <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
+          <div className="flex items-center">
+            <Building className="h-5 w-5 text-blue-600 dark:text-blue-400 mr-2" />
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Society *
-              </label>
-              <select
-                value={selectedSocietyId}
-                onChange={(e) => {
-                  setSelectedSocietyId(e.target.value);
-                  setFormData(prev => ({ ...prev, user_id: '' })); // Reset member selection
-                }}
-                required
-                className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
-              >
-                <option value="">Select a society</option>
-                {societies.map((society) => (
-                  <option key={society.society_id} value={society.society_id}>
-                    {society.name} - {society.city}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Member *
-              </label>
-              <select
-                name="user_id"
-                value={formData.user_id}
-                onChange={handleChange}
-                required
-                disabled={!selectedSocietyId}
-                className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:text-white disabled:opacity-50"
-              >
-                <option value="">
-                  {!selectedSocietyId ? 'Select society first' : 'Select a member'}
-                </option>
-                {membersData?.data.map((member) => (
-                  <option key={member.user_id} value={member.user_id}>
-                    {member.salutation} {member.first_name} {member.last_name} - {member.email}
-                  </option>
-                ))}
-              </select>
+              <h3 className="text-sm font-medium text-blue-900 dark:text-blue-100">
+                Selected Society
+              </h3>
+              <p className="text-sm text-blue-700 dark:text-blue-300">
+                {selectedSociety?.name} - {selectedSociety?.city}
+              </p>
             </div>
           </div>
+        </div>
+
+        {/* Member Selection */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white flex items-center">
+            <User className="h-5 w-5 mr-2" />
+            Member Selection
+          </h3>
+          
+          {membersLoading ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+              <span className="ml-3 text-gray-500 dark:text-gray-400">Loading members...</span>
+            </div>
+          ) : (
+            <MemberSearchSelect
+              members={membersData?.data || []}
+              selectedMemberId={formData.user_id}
+              onMemberSelect={handleMemberSelect}
+              placeholder="Search by name, phone, or email..."
+            />
+          )}
         </div>
 
         {/* Membership Details */}
@@ -365,7 +365,7 @@ const CreateMembershipForm: React.FC<CreateMembershipFormProps> = ({
           <button
             type="submit"
             disabled={isLoading}
-            className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-blue-300 disabled:cursor-not-allowed flex items-center"
+            className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:bg-purple-300 disabled:cursor-not-allowed flex items-center"
           >
             {isLoading ? (
               <>
