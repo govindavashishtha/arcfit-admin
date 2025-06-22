@@ -67,14 +67,6 @@ const TrainersPage: React.FC = () => {
     setCurrentPage(1);
   };
 
-  // Debug logging to check if society filter is being applied
-  useEffect(() => {
-    if (filters.society_id) {
-      console.log('Society filter applied:', filters.society_id);
-      console.log('Query params:', queryParams);
-    }
-  }, [filters.society_id, queryParams]);
-
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -179,16 +171,6 @@ const TrainersPage: React.FC = () => {
         onFiltersChange={handleFiltersChange}
         onClearFilters={handleClearFilters}
       />
-
-      {/* Debug Info - Remove in production */}
-      {process.env.NODE_ENV === 'development' && (
-        <div className="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg text-sm">
-          <strong>Debug Info:</strong>
-          <pre className="mt-2 text-xs overflow-auto">
-            {JSON.stringify({ filters, queryParams, totalResults: trainersData?.pagination.total }, null, 2)}
-          </pre>
-        </div>
-      )}
 
       {/* Error State */}
       {error && (
