@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
-import { Building, MapPin, Phone, Search, Plus, Edit2, Trash2 } from 'lucide-react';
+import { Building, MapPin, Phone, Search, Plus, Edit2 } from 'lucide-react';
 import { Society } from '../types/society';
 import { 
   useSocietiesQuery, 
   useCreateSocietyMutation, 
-  useUpdateSocietyMutation, 
-  useDeleteSocietyMutation 
+  useUpdateSocietyMutation 
 } from '../hooks/queries/useSocietyQueries';
 import SocietyForm from '../components/society/SocietyForm';
 
@@ -24,7 +23,6 @@ const SocietyPage: React.FC = () => {
   
   const createSocietyMutation = useCreateSocietyMutation();
   const updateSocietyMutation = useUpdateSocietyMutation();
-  const deleteSocietyMutation = useDeleteSocietyMutation();
 
   const handleCreateSociety = async (data: any) => {
     try {
@@ -47,18 +45,6 @@ const SocietyPage: React.FC = () => {
       setSelectedSociety(null);
     } catch (error) {
       console.error('Failed to update society:', error);
-    }
-  };
-
-  const handleDeleteSociety = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this society?')) {
-      return;
-    }
-
-    try {
-      await deleteSocietyMutation.mutateAsync(id);
-    } catch (error) {
-      console.error('Failed to delete society:', error);
     }
   };
 
@@ -178,13 +164,6 @@ const SocietyPage: React.FC = () => {
                       className="p-2 text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
                     >
                       <Edit2 className="h-5 w-5" />
-                    </button>
-                    <button
-                      onClick={() => handleDeleteSociety(society.society_id)}
-                      disabled={deleteSocietyMutation.isPending}
-                      className="p-2 text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 disabled:opacity-50"
-                    >
-                      <Trash2 className="h-5 w-5" />
                     </button>
                   </div>
                 </div>
