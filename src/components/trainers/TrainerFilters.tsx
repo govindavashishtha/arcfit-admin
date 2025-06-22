@@ -25,19 +25,8 @@ const TrainerFilters: React.FC<TrainerFiltersProps> = ({
 
   const hasActiveFilters = Object.values(filters).some(value => value && value !== '');
 
-  // Get unique specializations for filter options
-  const specializations = [
-    'Yoga',
-    'Pilates',
-    'CrossFit',
-    'Zumba',
-    'Aerobics',
-    'Weight Training',
-    'Cardio',
-    'Dance Fitness',
-    'Martial Arts',
-    'Swimming'
-  ];
+  // Limited specializations as requested
+  const specializations = ['dance', 'yoga', 'pilates'];
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 space-y-4">
@@ -90,7 +79,7 @@ const TrainerFilters: React.FC<TrainerFiltersProps> = ({
             <option value="">All Specializations</option>
             {specializations.map((spec) => (
               <option key={spec} value={spec}>
-                {spec}
+                {spec.charAt(0).toUpperCase() + spec.slice(1)}
               </option>
             ))}
           </select>

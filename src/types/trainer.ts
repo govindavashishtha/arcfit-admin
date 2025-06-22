@@ -3,6 +3,8 @@ export interface Society {
   name: string;
 }
 
+export type Specialization = 'dance' | 'yoga' | 'pilates';
+
 export interface Trainer {
   id: number;
   user_id: string;
@@ -28,7 +30,7 @@ export interface Trainer {
 }
 
 export interface TrainerFilters {
-  specialization?: string;
+  specialization?: Specialization;
   status?: string;
   society_id?: string;
   search?: string;
@@ -47,7 +49,7 @@ export interface PaginatedTrainersResponse {
 export interface TrainerQueryParams {
   page?: number;
   limit?: number;
-  specialization?: string;
+  specialization?: Specialization;
   status?: string;
   society_id?: string;
   search?: string;
@@ -61,7 +63,7 @@ export interface CreateTrainerData {
   phone_number: string;
   gender: 'male' | 'female' | 'other';
   dob: string;
-  specialisations: string[];
+  specialisations: Specialization[];
   certifications: string[];
   experience_in_years: number;
   address: string;
