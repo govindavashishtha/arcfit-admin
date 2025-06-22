@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, Filter, X } from 'lucide-react';
+import { Search, Filter, X, Building } from 'lucide-react';
 import { TrainerFilters as FilterType } from '../../types/trainer';
 import { useSocietiesQuery } from '../../hooks/queries/useSocietyQueries';
 
@@ -14,7 +14,7 @@ const TrainerFilters: React.FC<TrainerFiltersProps> = ({
   onFiltersChange,
   onClearFilters
 }) => {
-  const { data: societies = [] } = useSocietiesQuery();
+  const { data: societies = [], isLoading: societiesLoading } = useSocietiesQuery();
 
   const handleFilterChange = (key: keyof FilterType, value: string) => {
     onFiltersChange({
@@ -48,7 +48,7 @@ const TrainerFilters: React.FC<TrainerFiltersProps> = ({
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Search */}
-        <div className="lg:col-span-2">
+        <div className="lg:col-span-1">
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Search Trainers
           </label>
@@ -105,22 +105,82 @@ const TrainerFilters: React.FC<TrainerFiltersProps> = ({
         {/* Society Filter */}
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <Building className="inline h-4 w-4 mr-1" />
             Society
           </label>
           <select
             value={filters.society_id || ''}
             onChange={(e) => handleFilterChange('society_id', e.target.value)}
-            className="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:text-white sm:text-sm"
+            disabled={societiesLoading}
+            className="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:text-white sm:text-sm disabled:opacity-50"
           >
-            <option value="">All Societies</option>
+            <option value="">
+              {societiesLoading ? 'Loading societies...' : 'All Societies'}
+            </option>
             {societies.map((society) => (
               <option key={society.society_id} value={society.society_id}>
-                {society.name}
+                {society.name} - {society.city}
               </option>
             ))}
           </select>
+          {societiesLoading && (
+            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+              Loading available societies...
+            </p>
+          )}
         </div>
       </div>
+
+      {/* Active Filters Display */}
+      {hasActiveFilters && (
+        <div className="flex flex-wrap gap-2 pt-2 border-t border-gray-200 dark:border-gray-700">
+          <span className="text-sm text-gray-500 dark:text-gray-400">Active filters:</span>
+          {filters.search && (
+            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+              Search: "{filters.search}"
+              <button
+                onClick={() => handleFilterChange('search', '')}
+                className="ml-1 text-blue-600 hover:text-blue-800 dark:text-blue-300"
+              >
+                <X className="h-3 w-3" />
+              </button>
+            </span>
+          )}
+          {filters.specialization && (
+            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+              Specialization: {filters.specialization}
+              <button
+                onClick={() => handleFilterChange('specialization', '')}
+                className="ml-1 text-green-600 hover:text-green-800 dark:text-green-300"
+              >
+                <X className="h-3 w-3" />
+              </button>
+            </span>
+          )}
+          {filters.status && (
+            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
+              Status: {filters.status}
+              <button
+                onClick={() => handleFilterChange('status', '')}
+                className="ml-1 text-yellow-600 hover:text-yellow-800 dark:text-yellow-300"
+              >
+                <X className="h-3 w-3" />
+              </button>
+            </span>
+          )}
+          {filters.society_id && (
+            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
+              Society: {societies.find(s => s.society_id === filters.society_id)?.name || 'Unknown'}
+              <button
+                onClick={() => handleFilterChange('society_id', '')}
+                className="ml-1 text-purple-600 hover:text-purple-800 dark:text-purple-300"
+              >
+                <X className="h-3 w-3" />
+              </button>
+            </span>
+          )}
+        </div>
+      )}
     </div>
   );
 };
