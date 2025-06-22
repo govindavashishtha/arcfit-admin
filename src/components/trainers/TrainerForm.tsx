@@ -163,7 +163,7 @@ const TrainerForm: React.FC<TrainerFormProps> = ({
   };
 
   return (
-    <div className="max-w-4xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg">
       <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
         <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
           {initialData ? 'Edit Trainer' : 'Add New Trainer'}
