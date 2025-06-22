@@ -160,8 +160,7 @@ const TrainersTable: React.FC<TrainersTableProps> = ({
         </div>
       ),
     }),
-    // Commented out Actions column
-    /*
+    // Actions column
     columnHelper.display({
       id: 'actions',
       header: 'Actions',
@@ -188,7 +187,6 @@ const TrainersTable: React.FC<TrainersTableProps> = ({
         </div>
       ),
     }),
-    */
   ], [onEdit, onDelete]);
 
   const table = useReactTable({

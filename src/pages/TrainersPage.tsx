@@ -1,6 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { UserCheck, Plus } from 'lucide-react';
-import { useTrainersQuery, useDeleteTrainerMutation, useCreateTrainerMutation } from '../hooks/queries/useTrainerQueries';
+import { 
+  useTrainersQuery, 
+  useDeleteTrainerMutation, 
+  useCreateTrainerMutation, 
+  useUpdateTrainerMutation 
+} from '../hooks/queries/useTrainerQueries';
 import { Trainer, TrainerFilters as TrainerFiltersType, TrainerQueryParams, CreateTrainerData } from '../types/trainer';
 import TrainerFilters from '../components/trainers/TrainerFilters';
 import TrainersTable from '../components/trainers/TrainersTable';
@@ -31,6 +36,7 @@ const TrainersPage: React.FC = () => {
   
   const deleteTrainerMutation = useDeleteTrainerMutation();
   const createTrainerMutation = useCreateTrainerMutation();
+  const updateTrainerMutation = useUpdateTrainerMutation();
 
   // Reset page when filters change
   useEffect(() => {
@@ -86,8 +92,10 @@ const TrainersPage: React.FC = () => {
     if (!selectedTrainer) return;
 
     try {
-      // TODO: Implement update functionality
-      console.log('Update trainer:', { id: selectedTrainer.id, ...data });
+      await updateTrainerMutation.mutateAsync({
+        id: selectedTrainer.id,
+        ...data
+      });
       toast.success('Trainer updated successfully!');
       setShowForm(false);
       setSelectedTrainer(null);
@@ -108,7 +116,7 @@ const TrainersPage: React.FC = () => {
     setSelectedTrainer(null);
   };
 
-  const isFormLoading = createTrainerMutation.isPending;
+  const isFormLoading = createTrainerMutation.isPending || updateTrainerMutation.isPending;
 
   if (showForm) {
     return (

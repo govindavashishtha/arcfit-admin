@@ -61,7 +61,9 @@ const TrainerForm: React.FC<TrainerFormProps> = ({
         last_name: initialData.last_name,
         salutation: initialData.salutation,
         email: initialData.email,
-        phone_number: initialData.phone_number,
+        phone_number: initialData.phone_number.startsWith('+') 
+          ? initialData.phone_number.slice(3) // Remove +91 prefix for display
+          : initialData.phone_number,
         gender: initialData.gender,
         dob: initialData.dob.split('T')[0], // Convert to YYYY-MM-DD format
         specialisations: initialData.specialisations as Specialization[],
@@ -323,10 +325,13 @@ const TrainerForm: React.FC<TrainerFormProps> = ({
                   value={formData.phone_number}
                   onChange={handleChange}
                   required
-                  placeholder="+918360782226"
+                  placeholder="8360782226"
                   className="pl-10 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
                 />
               </div>
+              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                Enter without +91 prefix (will be added automatically)
+              </p>
             </div>
           </div>
         </div>

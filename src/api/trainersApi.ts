@@ -34,7 +34,7 @@ export const createTrainer = async (data: CreateTrainerData): Promise<ApiRespons
 
 export const updateTrainer = async (data: UpdateTrainerData): Promise<ApiResponse<Trainer>> => {
   const { id, ...updateData } = data;
-  const response = await api.put<ApiResponse<Trainer>>(`/api/trainers/${id}`, updateData);
+  const response = await api.patch<ApiResponse<Trainer>>(`/api/trainers/${id}`, updateData);
   return response.data;
 };
 
