@@ -80,7 +80,13 @@ const TrainerForm: React.FC<TrainerFormProps> = ({
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    
+    // Handle experience_in_years as number
+    if (name === 'experience_in_years') {
+      setFormData(prev => ({ ...prev, [name]: parseInt(value) || 0 }));
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleSpecializationToggle = (specialization: Specialization) => {
@@ -143,7 +149,8 @@ const TrainerForm: React.FC<TrainerFormProps> = ({
       const submitData = {
         ...formData,
         dob: `${formData.dob}T00:00:00Z`, // Convert to ISO format
-        phone_number: formData.phone_number.startsWith('+') ? formData.phone_number : `+91${formData.phone_number}`
+        phone_number: formData.phone_number.startsWith('+') ? formData.phone_number : `+91${formData.phone_number}`,
+        experience_in_years: Number(formData.experience_in_years) // Ensure it's a number
       };
 
       await onSubmit(submitData);
