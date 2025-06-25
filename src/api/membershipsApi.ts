@@ -21,6 +21,21 @@ export const getAllMemberships = async (params?: MembershipQueryParams): Promise
   return response.data;
 };
 
+export const getMembershipsBySociety = async (societyId: string, params?: MembershipQueryParams): Promise<ApiResponse<PaginatedMembershipsResponse>> => {
+  const queryParams = new URLSearchParams();
+  
+  if (params?.page) queryParams.append('page', params.page.toString());
+  if (params?.limit) queryParams.append('limit', params.limit.toString());
+  if (params?.status) queryParams.append('status', params.status);
+  if (params?.type) queryParams.append('type', params.type);
+  if (params?.search) queryParams.append('search', params.search);
+  if (params?.start_date) queryParams.append('start_date', params.start_date);
+  if (params?.end_date) queryParams.append('end_date', params.end_date);
+
+  const response = await api.get<ApiResponse<PaginatedMembershipsResponse>>(`/api/memberships/society/${societyId}?${queryParams.toString()}`);
+  return response.data;
+};
+
 export const getMembershipById = async (id: string): Promise<ApiResponse<Membership>> => {
   const response = await api.get<ApiResponse<Membership>>(`/api/memberships/${id}`);
   return response.data;
