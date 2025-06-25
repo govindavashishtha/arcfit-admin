@@ -4,6 +4,7 @@ export * from './useSocietyQueries';
 export * from './useMemberQueries';
 export * from './useTrainerQueries';
 export * from './useMembershipQueries';
+export * from './useEventQueries';
 
 // Export query keys for external use
 export { authKeys } from './useAuthQueries';
@@ -11,3 +12,4 @@ export { societyKeys } from './useSocietyQueries';
 export { memberKeys } from './useMemberQueries';
 export { trainerKeys } from './useTrainerQueries';
 export { membershipKeys } from './useMembershipQueries';
+export { eventKeys } from './useEventQueries';

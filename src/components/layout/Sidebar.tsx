@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import { Users, UserCheck, Building, LayoutDashboard, CreditCard, Menu, X } from 'lucide-react';
+import { Users, UserCheck, Building, LayoutDashboard, CreditCard, Calendar, Menu, X } from 'lucide-react';
 import useAuth from '../../hooks/useAuth';
 
 interface SidebarProps {
@@ -35,6 +35,11 @@ const Sidebar: React.FC<SidebarProps> = ({ isMobile }) => {
       name: 'Memberships',
       path: '/memberships',
       icon: <CreditCard className="w-5 h-5" />,
+    },
+    {
+      name: 'Events',
+      path: '/events',
+      icon: <Calendar className="w-5 h-5" />,
     },
     {
       name: 'Society',

@@ -7,6 +7,7 @@ import DashboardPage from './pages/DashboardPage';
 import MembersPage from './pages/MembersPage';
 import TrainersPage from './pages/TrainersPage';
 import MembershipsPage from './pages/MembershipsPage';
+import EventsPage from './pages/EventsPage';
 import SocietyPage from './pages/SocietyPage';
 import DashboardLayout from './components/layout/DashboardLayout';
 import AuthRoute from './components/routes/AuthRoute';
@@ -32,6 +33,7 @@ function App() {
                 <Route path="/members" element={<MembersPage />} />
                 <Route path="/trainers" element={<TrainersPage />} />
                 <Route path="/memberships" element={<MembershipsPage />} />
+                <Route path="/events" element={<EventsPage />} />
                 <Route path="/society" element={<SocietyPage />} />
               </Route>
             </Route>
