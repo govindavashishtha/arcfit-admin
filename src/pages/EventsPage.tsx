@@ -5,8 +5,10 @@ import { EventFilters as EventFiltersType, EventQueryParams } from '../types/eve
 import EventFilters from '../components/events/EventFilters';
 import EventsTable from '../components/events/EventsTable';
 import BulkUploadModal from '../components/events/BulkUploadModal';
+import { useSociety } from '../contexts/SocietyContext';
 
 const EventsPage: React.FC = () => {
+  const { selectedSocietyId } = useSociety();
   const [showBulkUploadModal, setShowBulkUploadModal] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize] = useState(10);
@@ -16,6 +18,7 @@ const EventsPage: React.FC = () => {
   const queryParams: EventQueryParams = {
     page: currentPage,
     limit: pageSize,
+    society_id: selectedSocietyId,
     ...filters
   };
 
@@ -30,7 +33,7 @@ const EventsPage: React.FC = () => {
   // Reset page when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [filters]);
+  }, [selectedSocietyId, filters]);
 
   const handleFiltersChange = (newFilters: EventFiltersType) => {
     setFilters(newFilters);
@@ -57,13 +60,15 @@ const EventsPage: React.FC = () => {
         <div className="mt-4 lg:mt-0 flex space-x-3">
           <button
             onClick={() => setShowBulkUploadModal(true)}
-            className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            disabled={!selectedSocietyId}
+            className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:bg-indigo-300 disabled:cursor-not-allowed"
           >
             <Upload className="h-4 w-4 mr-2" />
             Add Bulk Events
           </button>
           <button
-            className="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            disabled={!selectedSocietyId}
+            className="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Plus className="h-4 w-4 mr-2" />
             Add Single Event
@@ -72,14 +77,27 @@ const EventsPage: React.FC = () => {
       </div>
 
       {/* Filters */}
-      <EventFilters
-        filters={filters}
-        onFiltersChange={handleFiltersChange}
-        onClearFilters={handleClearFilters}
-      />
+      {selectedSocietyId && (
+        <EventFilters
+          filters={filters}
+          onFiltersChange={handleFiltersChange}
+          onClearFilters={handleClearFilters}
+        />
+      )}
+
+      {/* Empty State */}
+      {!selectedSocietyId && (
+        <div className="text-center py-12">
+          <Calendar className="mx-auto h-12 w-12 text-gray-400" />
+          <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-white">No society selected</h3>
+          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            Please select a society from the sidebar to view its events.
+          </p>
+        </div>
+      )}
 
       {/* Error State */}
-      {eventsError && (
+      {eventsError && selectedSocietyId && (
         <div className="bg-red-50 dark:bg-red-900/20 border-l-4 border-red-400 p-4">
           <div className="flex">
             <div className="flex-shrink-0">
@@ -103,13 +121,15 @@ const EventsPage: React.FC = () => {
       )}
 
       {/* Events Table */}
-      <EventsTable
-        data={eventsData?.data || []}
-        isLoading={eventsLoading}
-      />
+      {selectedSocietyId && (
+        <EventsTable
+          data={eventsData?.data || []}
+          isLoading={eventsLoading}
+        />
+      )}
 
       {/* Server-side Pagination */}
-      {eventsData && eventsData.pagination.pages > 1 && (
+      {selectedSocietyId && eventsData && eventsData.pagination.pages > 1 && (
         <div className="bg-white dark:bg-gray-800 px-4 py-3 flex items-center justify-between border-t border-gray-200 dark:border-gray-700 rounded-lg shadow">
           <div className="flex-1 flex justify-between sm:hidden">
             <button

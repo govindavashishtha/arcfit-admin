@@ -2,12 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { Users, Plus } from 'lucide-react';
 import { useMembersQuery, useDeleteMemberMutation } from '../hooks/queries/useMemberQueries';
 import { Member, MemberFilters as MemberFiltersType, MemberQueryParams } from '../types/member';
-import SocietyPicker from '../components/members/SocietyPicker';
 import MemberFilters from '../components/members/MemberFilters';
 import MembersTable from '../components/members/MembersTable';
+import { useSociety } from '../contexts/SocietyContext';
 
 const MembersPage: React.FC = () => {
-  const [selectedSocietyId, setSelectedSocietyId] = useState<string>('');
+  const { selectedSocietyId } = useSociety();
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize] = useState(10);
   const [filters, setFilters] = useState<MemberFiltersType>({});
@@ -35,11 +35,6 @@ const MembersPage: React.FC = () => {
     setCurrentPage(1);
   }, [selectedSocietyId, filters]);
 
-  const handleSocietyChange = (societyId: string) => {
-    setSelectedSocietyId(societyId);
-    setFilters({}); // Clear filters when society changes
-  };
-
   const handleFiltersChange = (newFilters: MemberFiltersType) => {
     setFilters(newFilters);
   };
@@ -65,11 +60,6 @@ const MembersPage: React.FC = () => {
     }
   };
 
-  const handleAddMember = () => {
-    // TODO: Implement add member functionality
-    console.log('Add member for society:', selectedSocietyId);
-  };
-
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -83,82 +73,58 @@ const MembersPage: React.FC = () => {
             Manage and monitor members across different societies
           </p>
         </div>
-        
-        {/* Commented out Add Member Button */}
-        {/* 
-        <div className="mt-4 lg:mt-0">
-          <button
-            onClick={handleAddMember}
-            disabled={!selectedSocietyId}
-            className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Add Member
-          </button>
-        </div>
-        */}
       </div>
 
-      {/* Society Picker */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        <div className="lg:col-span-1">
-          <SocietyPicker
-            selectedSocietyId={selectedSocietyId}
-            onSocietyChange={handleSocietyChange}
-          />
-        </div>
-        
-        {/* Stats Cards */}
-        {selectedSocietyId && membersData && (
-          <div className="lg:col-span-3 grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <Users className="h-8 w-8 text-blue-600" />
-                </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Total Members</p>
-                  <p className="text-2xl font-semibold text-gray-900 dark:text-white">
-                    {membersData.pagination.total}
-                  </p>
-                </div>
+      {/* Stats Cards */}
+      {selectedSocietyId && membersData && (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <Users className="h-8 w-8 text-blue-600" />
               </div>
-            </div>
-            
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <div className="h-8 w-8 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center">
-                    <div className="h-4 w-4 bg-green-600 rounded-full"></div>
-                  </div>
-                </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Active Members</p>
-                  <p className="text-2xl font-semibold text-gray-900 dark:text-white">
-                    {membersData.data.filter(m => m.status === 'active').length}
-                  </p>
-                </div>
-              </div>
-            </div>
-            
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <div className="h-8 w-8 bg-yellow-100 dark:bg-yellow-900 rounded-full flex items-center justify-center">
-                    <div className="h-4 w-4 bg-yellow-600 rounded-full"></div>
-                  </div>
-                </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Pending Verification</p>
-                  <p className="text-2xl font-semibold text-gray-900 dark:text-white">
-                    {membersData.data.filter(m => m.verification_status === 'pending').length}
-                  </p>
-                </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Total Members</p>
+                <p className="text-2xl font-semibold text-gray-900 dark:text-white">
+                  {membersData.pagination.total}
+                </p>
               </div>
             </div>
           </div>
-        )}
-      </div>
+          
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <div className="h-8 w-8 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center">
+                  <div className="h-4 w-4 bg-green-600 rounded-full"></div>
+                </div>
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Active Members</p>
+                <p className="text-2xl font-semibold text-gray-900 dark:text-white">
+                  {membersData.data.filter(m => m.status === 'active').length}
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <div className="h-8 w-8 bg-yellow-100 dark:bg-yellow-900 rounded-full flex items-center justify-center">
+                  <div className="h-4 w-4 bg-yellow-600 rounded-full"></div>
+                </div>
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Pending Verification</p>
+                <p className="text-2xl font-semibold text-gray-900 dark:text-white">
+                  {membersData.data.filter(m => m.verification_status === 'pending').length}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Filters */}
       {selectedSocietyId && (
@@ -199,7 +165,7 @@ const MembersPage: React.FC = () => {
           <Users className="mx-auto h-12 w-12 text-gray-400" />
           <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-white">No society selected</h3>
           <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-            Please select a society to view its members.
+            Please select a society from the sidebar to view its members.
           </p>
         </div>
       )}

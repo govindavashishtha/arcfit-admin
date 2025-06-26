@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { Users, UserCheck, Building, LayoutDashboard, CreditCard, Calendar, Menu, X } from 'lucide-react';
 import useAuth from '../../hooks/useAuth';
+import SocietySelector from './SocietySelector';
 
 interface SidebarProps {
   isMobile: boolean;
@@ -90,6 +91,9 @@ const Sidebar: React.FC<SidebarProps> = ({ isMobile }) => {
             </div>
           </div>
         </div>
+
+        {/* Society Selector */}
+        <SocietySelector />
 
         <nav className="p-5">
           <ul className="space-y-2">

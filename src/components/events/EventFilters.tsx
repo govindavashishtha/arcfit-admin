@@ -1,7 +1,6 @@
 import React from 'react';
 import { Search, Filter, X, Calendar } from 'lucide-react';
 import { EventFilters as FilterType } from '../../types/event';
-import { useSocietiesQuery } from '../../hooks/queries/useSocietyQueries';
 
 interface EventFiltersProps {
   filters: FilterType;
@@ -14,8 +13,6 @@ const EventFilters: React.FC<EventFiltersProps> = ({
   onFiltersChange,
   onClearFilters
 }) => {
-  const { data: societies = [] } = useSocietiesQuery();
-
   const handleFilterChange = (key: keyof FilterType, value: string) => {
     onFiltersChange({
       ...filters,
@@ -55,26 +52,7 @@ const EventFilters: React.FC<EventFiltersProps> = ({
         )}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-        {/* Society Filter */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Society
-          </label>
-          <select
-            value={filters.society_id || ''}
-            onChange={(e) => handleFilterChange('society_id', e.target.value)}
-            className="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-white sm:text-sm"
-          >
-            <option value="">All Societies</option>
-            {societies.map((society) => (
-              <option key={society.society_id} value={society.society_id}>
-                {society.name}
-              </option>
-            ))}
-          </select>
-        </div>
-
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Type Filter */}
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">

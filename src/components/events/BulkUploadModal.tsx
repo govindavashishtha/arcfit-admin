@@ -1,8 +1,8 @@
 import React, { useState, useRef } from 'react';
-import { X, Upload, FileText, Building, AlertCircle } from 'lucide-react';
-import { useSocietiesQuery } from '../../hooks/queries/useSocietyQueries';
+import { X, Upload, FileText, AlertCircle } from 'lucide-react';
 import { useUploadBulkEventsMutation } from '../../hooks/queries/useEventQueries';
 import toast from 'react-hot-toast';
+import { useSociety } from '../../contexts/SocietyContext';
 
 interface BulkUploadModalProps {
   isOpen: boolean;
@@ -10,12 +10,11 @@ interface BulkUploadModalProps {
 }
 
 const BulkUploadModal: React.FC<BulkUploadModalProps> = ({ isOpen, onClose }) => {
-  const [selectedSocietyId, setSelectedSocietyId] = useState<string>('');
+  const { selectedSocietyId, selectedSociety } = useSociety();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isDragOver, setIsDragOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const { data: societies = [], isLoading: societiesLoading } = useSocietiesQuery();
   const uploadBulkEventsMutation = useUploadBulkEventsMutation();
 
   const handleFileSelect = (file: File) => {
@@ -55,7 +54,7 @@ const BulkUploadModal: React.FC<BulkUploadModalProps> = ({ isOpen, onClose }) =>
 
   const handleUpload = async () => {
     if (!selectedSocietyId) {
-      toast.error('Please select a society');
+      toast.error('Please select a society from the sidebar');
       return;
     }
 
@@ -78,7 +77,6 @@ const BulkUploadModal: React.FC<BulkUploadModalProps> = ({ isOpen, onClose }) =>
   };
 
   const handleClose = () => {
-    setSelectedSocietyId('');
     setSelectedFile(null);
     setIsDragOver(false);
     onClose();
@@ -112,27 +110,18 @@ const BulkUploadModal: React.FC<BulkUploadModalProps> = ({ isOpen, onClose }) =>
 
         {/* Content */}
         <div className="p-6 space-y-6">
-          {/* Society Selection */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              <Building className="inline h-4 w-4 mr-1" />
-              Select Society *
-            </label>
-            <select
-              value={selectedSocietyId}
-              onChange={(e) => setSelectedSocietyId(e.target.value)}
-              disabled={societiesLoading}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-            >
-              <option value="">
-                {societiesLoading ? 'Loading societies...' : 'Select a society'}
-              </option>
-              {societies.map((society) => (
-                <option key={society.society_id} value={society.society_id}>
-                  {society.name} - {society.city}
-                </option>
-              ))}
-            </select>
+          {/* Society Info */}
+          <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
+            <div className="flex items-center">
+              <div>
+                <h3 className="text-sm font-medium text-blue-900 dark:text-blue-100">
+                  Selected Society
+                </h3>
+                <p className="text-sm text-blue-700 dark:text-blue-300">
+                  {selectedSociety?.name} - {selectedSociety?.city}
+                </p>
+              </div>
+            </div>
           </div>
 
           {/* File Upload Area */}

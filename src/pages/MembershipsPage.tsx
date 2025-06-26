@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { CreditCard, Plus, Building } from 'lucide-react';
+import { CreditCard, Plus } from 'lucide-react';
 import { useCreateMembershipMutation, useMembershipsBySocietyQuery } from '../hooks/queries/useMembershipQueries';
-import { useSocietiesQuery } from '../hooks/queries/useSocietyQueries';
 import { CreateMembershipData, MembershipFilters as MembershipFiltersType, MembershipQueryParams } from '../types/membership';
 import CreateMembershipForm from '../components/memberships/CreateMembershipForm';
 import MembershipFilters from '../components/memberships/MembershipFilters';
 import MembershipsTable from '../components/memberships/MembershipsTable';
 import toast from 'react-hot-toast';
+import { useSociety } from '../contexts/SocietyContext';
 
 const MembershipsPage: React.FC = () => {
+  const { selectedSocietyId } = useSociety();
   const [showForm, setShowForm] = useState(false);
-  const [selectedSocietyId, setSelectedSocietyId] = useState<string>('');
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize] = useState(10);
   const [filters, setFilters] = useState<MembershipFiltersType>({});
@@ -24,7 +24,6 @@ const MembershipsPage: React.FC = () => {
 
   // TanStack Query hooks
   const createMembershipMutation = useCreateMembershipMutation();
-  const { data: societies = [], isLoading: societiesLoading } = useSocietiesQuery();
   const { 
     data: membershipsData, 
     isLoading: membershipsLoading, 
@@ -51,11 +50,6 @@ const MembershipsPage: React.FC = () => {
 
   const handleCancelForm = () => {
     setShowForm(false);
-  };
-
-  const handleSocietyChange = (societyId: string) => {
-    setSelectedSocietyId(societyId);
-    setFilters({}); // Clear filters when society changes
   };
 
   const handleFiltersChange = (newFilters: MembershipFiltersType) => {
@@ -107,99 +101,72 @@ const MembershipsPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Society Selection */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        <div className="lg:col-span-1">
+      {/* Stats Cards */}
+      {selectedSocietyId && membershipsData && (
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white flex items-center mb-4">
-              <Building className="h-5 w-5 mr-2" />
-              Select Society
-            </h3>
-            <select
-              value={selectedSocietyId}
-              onChange={(e) => handleSocietyChange(e.target.value)}
-              disabled={societiesLoading}
-              className="w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-purple-500 focus:ring-purple-500 dark:bg-gray-700 dark:text-white"
-            >
-              <option value="">
-                {societiesLoading ? 'Loading societies...' : 'Select a society'}
-              </option>
-              {societies.map((society) => (
-                <option key={society.society_id} value={society.society_id}>
-                  {society.name} - {society.city}
-                </option>
-              ))}
-            </select>
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <CreditCard className="h-8 w-8 text-purple-600" />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Total Memberships</p>
+                <p className="text-2xl font-semibold text-gray-900 dark:text-white">
+                  {membershipsData.pagination.total}
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <div className="h-8 w-8 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center">
+                  <div className="h-4 w-4 bg-green-600 rounded-full"></div>
+                </div>
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Active</p>
+                <p className="text-2xl font-semibold text-gray-900 dark:text-white">
+                  {membershipsData.data.filter(m => m.status === 'active').length}
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <div className="h-8 w-8 bg-yellow-100 dark:bg-yellow-900 rounded-full flex items-center justify-center">
+                  <div className="h-4 w-4 bg-yellow-600 rounded-full"></div>
+                </div>
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Paused</p>
+                <p className="text-2xl font-semibold text-gray-900 dark:text-white">
+                  {membershipsData.data.filter(m => m.status === 'paused').length}
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <div className="h-8 w-8 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
+                  <div className="h-4 w-4 bg-blue-600 rounded-full"></div>
+                </div>
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Revenue</p>
+                <p className="text-2xl font-semibold text-gray-900 dark:text-white">
+                  ₹{membershipsData.data.reduce((sum, m) => sum + m.payment_amount, 0).toLocaleString()}
+                </p>
+              </div>
+            </div>
           </div>
         </div>
-
-        {/* Stats Cards */}
-        {selectedSocietyId && membershipsData && (
-          <div className="lg:col-span-3 grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <CreditCard className="h-8 w-8 text-purple-600" />
-                </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Total Memberships</p>
-                  <p className="text-2xl font-semibold text-gray-900 dark:text-white">
-                    {membershipsData.pagination.total}
-                  </p>
-                </div>
-              </div>
-            </div>
-            
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <div className="h-8 w-8 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center">
-                    <div className="h-4 w-4 bg-green-600 rounded-full"></div>
-                  </div>
-                </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Active</p>
-                  <p className="text-2xl font-semibold text-gray-900 dark:text-white">
-                    {membershipsData.data.filter(m => m.status === 'active').length}
-                  </p>
-                </div>
-              </div>
-            </div>
-            
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <div className="h-8 w-8 bg-yellow-100 dark:bg-yellow-900 rounded-full flex items-center justify-center">
-                    <div className="h-4 w-4 bg-yellow-600 rounded-full"></div>
-                  </div>
-                </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Paused</p>
-                  <p className="text-2xl font-semibold text-gray-900 dark:text-white">
-                    {membershipsData.data.filter(m => m.status === 'paused').length}
-                  </p>
-                </div>
-              </div>
-            </div>
-            
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <div className="h-8 w-8 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
-                    <div className="h-4 w-4 bg-blue-600 rounded-full"></div>
-                  </div>
-                </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Revenue</p>
-                  <p className="text-2xl font-semibold text-gray-900 dark:text-white">
-                    ₹{membershipsData.data.reduce((sum, m) => sum + m.payment_amount, 0).toLocaleString()}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
+      )}
 
       {/* Filters */}
       {selectedSocietyId && (
@@ -322,9 +289,9 @@ const MembershipsPage: React.FC = () => {
             </div>
             <div className="p-6">
               <div className="text-center">
-                <Building className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+                <CreditCard className="mx-auto h-12 w-12 text-gray-400 mb-4" />
                 <p className="text-gray-500 dark:text-gray-400 mb-4">
-                  Select a society above to start viewing and managing memberships
+                  Select a society from the sidebar to start viewing and managing memberships
                 </p>
                 <div className="text-sm text-gray-400 dark:text-gray-500">
                   Once you select a society, you'll see all memberships for that location
