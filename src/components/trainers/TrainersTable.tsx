@@ -27,8 +27,11 @@ import {
   Award,
   Star,
   UserCheck,
-  Building
+  Building,
+  Copy,
+  Check
 } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 interface TrainersTableProps {
   data: Trainer[];
@@ -45,6 +48,23 @@ const TrainersTable: React.FC<TrainersTableProps> = ({
   onEdit,
   onDelete
 }) => {
+  const [copiedId, setCopiedId] = React.useState<string | null>(null);
+
+  const handleCopyTrainerId = async (trainerId: string) => {
+    try {
+      await navigator.clipboard.writeText(trainerId);
+      setCopiedId(trainerId);
+      toast.success('Trainer ID copied to clipboard!');
+      
+      // Reset the copied state after 2 seconds
+      setTimeout(() => {
+        setCopiedId(null);
+      }, 2000);
+    } catch (error) {
+      toast.error('Failed to copy trainer ID');
+    }
+  };
+
   const columns = useMemo<ColumnDef<Trainer, any>[]>(() => [
     columnHelper.accessor('first_name', {
       id: 'name',
@@ -60,8 +80,21 @@ const TrainersTable: React.FC<TrainersTableProps> = ({
             <div className="text-sm font-medium text-gray-900 dark:text-white">
               {row.original.salutation} {row.original.first_name} {row.original.last_name}
             </div>
-            <div className="text-sm text-gray-500 dark:text-gray-400">
-              ID: {row.original.id}
+            <div className="flex items-center space-x-2">
+              <span className="text-sm text-gray-500 dark:text-gray-400">
+                ID: {row.original.id}
+              </span>
+              <button
+                onClick={() => handleCopyTrainerId(row.original.id.toString())}
+                className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                title="Copy Trainer ID"
+              >
+                {copiedId === row.original.id.toString() ? (
+                  <Check className="h-3 w-3 text-green-500" />
+                ) : (
+                  <Copy className="h-3 w-3" />
+                )}
+              </button>
             </div>
           </div>
         </div>
@@ -187,7 +220,7 @@ const TrainersTable: React.FC<TrainersTableProps> = ({
         </div>
       ),
     }),
-  ], [onEdit, onDelete]);
+  ], [onEdit, onDelete, copiedId]);
 
   const table = useReactTable({
     data,
