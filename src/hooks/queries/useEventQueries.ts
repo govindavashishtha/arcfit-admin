@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Event, EventQueryParams } from '../../types/event';
-import { getAllEvents, getEventById, uploadBulkEvents } from '../../api/eventsApi';
+import { getAllEvents, getEventById, uploadBulkEvents, cancelEvent } from '../../api/eventsApi';
 
 // Query Keys
 export const eventKeys = {
@@ -61,6 +61,31 @@ export const useUploadBulkEventsMutation = () => {
     },
     onError: (error) => {
       console.error('Upload bulk events error:', error);
+    },
+  });
+};
+
+// Cancel Event Mutation
+export const useCancelEventMutation = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async (eventId: string) => {
+      const response = await cancelEvent(eventId);
+      if (!response.success) {
+        throw new Error('Failed to cancel event');
+      }
+      return response.data;
+    },
+    onSuccess: (data, eventId) => {
+      // Update the specific event in cache
+      queryClient.setQueryData(eventKeys.detail(eventId), data);
+      
+      // Invalidate and refetch events list
+      queryClient.invalidateQueries({ queryKey: eventKeys.lists() });
+    },
+    onError: (error) => {
+      console.error('Cancel event error:', error);
     },
   });
 };

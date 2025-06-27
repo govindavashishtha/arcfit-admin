@@ -34,3 +34,10 @@ export const uploadBulkEvents = async (societyId: string, csvFile: File): Promis
   });
   return response.data;
 };
+
+export const cancelEvent = async (eventId: string): Promise<ApiResponse<Event>> => {
+  const response = await api.patch<ApiResponse<Event>>(`/api/events/${eventId}/status`, {
+    status: 'cancelled'
+  });
+  return response.data;
+};

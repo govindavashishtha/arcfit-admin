@@ -26,8 +26,11 @@ import {
   User,
   Tag,
   Dumbbell,
-  Star
+  Star,
+  X
 } from 'lucide-react';
+import { useCancelEventMutation } from '../../hooks/queries/useEventQueries';
+import toast from 'react-hot-toast';
 
 interface EventsTableProps {
   data: Event[];
@@ -40,6 +43,27 @@ const EventsTable: React.FC<EventsTableProps> = ({
   data,
   isLoading
 }) => {
+  const cancelEventMutation = useCancelEventMutation();
+
+  const handleCancelEvent = async (event: Event) => {
+    // Show confirmation dialog
+    const confirmed = window.confirm(
+      `Are you sure you want to cancel the event "${event.meta_data?.name || 'Unnamed Event'}"?\n\nThis action cannot be undone.`
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      await cancelEventMutation.mutateAsync(event.event_id);
+      toast.success('Event cancelled successfully!');
+    } catch (error) {
+      console.error('Failed to cancel event:', error);
+      toast.error('Failed to cancel event. Please try again.');
+    }
+  };
+
   const columns = useMemo<ColumnDef<Event, any>[]>(() => [
     columnHelper.accessor('meta_data.name', {
       id: 'name',
@@ -206,7 +230,35 @@ const EventsTable: React.FC<EventsTableProps> = ({
         );
       },
     }),
-  ], []);
+    // Actions column
+    columnHelper.display({
+      id: 'actions',
+      header: 'Actions',
+      cell: ({ row }) => {
+        const event = row.original;
+        const canCancel = event.status === 'scheduled';
+        
+        return (
+          <div className="flex space-x-2">
+            {canCancel && (
+              <button
+                onClick={() => handleCancelEvent(event)}
+                disabled={cancelEventMutation.isPending}
+                className="p-1 text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                title="Cancel event"
+              >
+                {cancelEventMutation.isPending ? (
+                  <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-red-600"></div>
+                ) : (
+                  <X className="h-4 w-4" />
+                )}
+              </button>
+            )}
+          </div>
+        );
+      },
+    }),
+  ], [cancelEventMutation.isPending]);
 
   const table = useReactTable({
     data,
