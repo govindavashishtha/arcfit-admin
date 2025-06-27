@@ -50,18 +50,18 @@ const TrainersTable: React.FC<TrainersTableProps> = ({
 }) => {
   const [copiedId, setCopiedId] = React.useState<string | null>(null);
 
-  const handleCopyTrainerId = async (trainerId: string) => {
+  const handleCopyTrainerId = async (userId: string) => {
     try {
-      await navigator.clipboard.writeText(trainerId);
-      setCopiedId(trainerId);
-      toast.success('Trainer ID copied to clipboard!');
+      await navigator.clipboard.writeText(userId);
+      setCopiedId(userId);
+      toast.success('Trainer User ID copied to clipboard!');
       
       // Reset the copied state after 2 seconds
       setTimeout(() => {
         setCopiedId(null);
       }, 2000);
     } catch (error) {
-      toast.error('Failed to copy trainer ID');
+      toast.error('Failed to copy trainer User ID');
     }
   };
 
@@ -82,14 +82,14 @@ const TrainersTable: React.FC<TrainersTableProps> = ({
             </div>
             <div className="flex items-center space-x-2">
               <span className="text-sm text-gray-500 dark:text-gray-400">
-                ID: {row.original.id}
+                ID: {row.original.user_id.slice(0, 8)}...
               </span>
               <button
-                onClick={() => handleCopyTrainerId(row.original.id.toString())}
+                onClick={() => handleCopyTrainerId(row.original.user_id)}
                 className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
-                title="Copy Trainer ID"
+                title="Copy Trainer User ID"
               >
-                {copiedId === row.original.id.toString() ? (
+                {copiedId === row.original.user_id ? (
                   <Check className="h-3 w-3 text-green-500" />
                 ) : (
                   <Copy className="h-3 w-3" />
