@@ -33,6 +33,7 @@ import {
 import { useCancelEventMutation } from '../../hooks/queries/useEventQueries';
 import toast from 'react-hot-toast';
 import ConfirmationModal from '../ui/ConfirmationModal';
+import { formatDateToIST, formatTimeToIST } from '../../utils/dateUtils';
 
 interface EventsTableProps {
   data: Event[];
@@ -130,9 +131,10 @@ const EventsTable: React.FC<EventsTableProps> = ({
     columnHelper.accessor('date', {
       header: 'Date & Time',
       cell: ({ row }) => {
-        const date = new Date(row.original.date).toLocaleDateString();
-        const startTime = new Date(row.original.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        const endTime = new Date(row.original.end_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        // Use IST formatting utilities
+        const date = formatDateToIST(row.original.date);
+        const startTime = formatTimeToIST(row.original.start_time);
+        const endTime = formatTimeToIST(row.original.end_time);
         
         return (
           <div className="space-y-1">
@@ -143,6 +145,9 @@ const EventsTable: React.FC<EventsTableProps> = ({
             <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
               <Clock className="h-3 w-3 mr-1 text-gray-400" />
               {startTime} - {endTime}
+            </div>
+            <div className="text-xs text-blue-600 dark:text-blue-400 font-medium">
+              IST
             </div>
           </div>
         );

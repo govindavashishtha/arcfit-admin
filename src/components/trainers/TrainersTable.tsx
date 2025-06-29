@@ -32,6 +32,7 @@ import {
   Check
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { formatDateToIST } from '../../utils/dateUtils';
 
 interface TrainersTableProps {
   data: Trainer[];
@@ -187,9 +188,14 @@ const TrainersTable: React.FC<TrainersTableProps> = ({
     columnHelper.accessor('created_at', {
       header: 'Join Date',
       cell: ({ getValue }) => (
-        <div className="flex items-center text-sm text-gray-900 dark:text-white">
-          <Calendar className="h-3 w-3 mr-1 text-gray-400" />
-          {new Date(getValue()).toLocaleDateString()}
+        <div className="space-y-1">
+          <div className="flex items-center text-sm text-gray-900 dark:text-white">
+            <Calendar className="h-3 w-3 mr-1 text-gray-400" />
+            {formatDateToIST(getValue())}
+          </div>
+          <div className="text-xs text-blue-600 dark:text-blue-400 font-medium">
+            IST
+          </div>
         </div>
       ),
     }),

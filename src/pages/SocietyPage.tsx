@@ -7,6 +7,7 @@ import {
   useUpdateSocietyMutation 
 } from '../hooks/queries/useSocietyQueries';
 import SocietyForm from '../components/society/SocietyForm';
+import { formatTimeToIST } from '../utils/dateUtils';
 
 const SocietyPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -220,15 +221,18 @@ const SocietyPage: React.FC = () => {
                   <div>
                     <div className="text-xs text-gray-500 dark:text-gray-400">Morning Hours</div>
                     <div className="text-sm font-medium text-gray-900 dark:text-white">
-                      {new Date(society.morning_start_time).toLocaleTimeString()} - {new Date(society.morning_end_time).toLocaleTimeString()}
+                      {formatTimeToIST(society.morning_start_time)} - {formatTimeToIST(society.morning_end_time)}
                     </div>
                   </div>
                   <div>
                     <div className="text-xs text-gray-500 dark:text-gray-400">Evening Hours</div>
                     <div className="text-sm font-medium text-gray-900 dark:text-white">
-                      {new Date(society.evening_start_time).toLocaleTimeString()} - {new Date(society.evening_end_time).toLocaleTimeString()}
+                      {formatTimeToIST(society.evening_start_time)} - {formatTimeToIST(society.evening_end_time)}
                     </div>
                   </div>
+                </div>
+                <div className="text-xs text-blue-600 dark:text-blue-400 font-medium">
+                  IST
                 </div>
               </div>
             </div>

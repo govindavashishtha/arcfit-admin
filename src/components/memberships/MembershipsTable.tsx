@@ -29,6 +29,7 @@ import {
   Clock,
   Pause
 } from 'lucide-react';
+import { formatDateToIST } from '../../utils/dateUtils';
 
 interface MembershipsTableProps {
   data: Membership[];
@@ -111,11 +112,14 @@ const MembershipsTable: React.FC<MembershipsTableProps> = ({
         <div className="space-y-1">
           <div className="flex items-center text-xs text-gray-600 dark:text-gray-400">
             <Calendar className="h-3 w-3 mr-1 text-gray-400" />
-            <span>Start: {new Date(row.original.start_date).toLocaleDateString()}</span>
+            <span>Start: {formatDateToIST(row.original.start_date)}</span>
           </div>
           <div className="flex items-center text-xs text-gray-600 dark:text-gray-400">
             <Calendar className="h-3 w-3 mr-1 text-gray-400" />
-            <span>End: {new Date(row.original.end_date).toLocaleDateString()}</span>
+            <span>End: {formatDateToIST(row.original.end_date)}</span>
+          </div>
+          <div className="text-xs text-blue-600 dark:text-blue-400 font-medium">
+            IST
           </div>
         </div>
       ),
@@ -138,7 +142,7 @@ const MembershipsTable: React.FC<MembershipsTableProps> = ({
             {row.original.pause_end_date && (
               <div className="flex items-center text-xs text-gray-500 dark:text-gray-400">
                 <Pause className="h-3 w-3 mr-1" />
-                Until: {new Date(row.original.pause_end_date).toLocaleDateString()}
+                Until: {formatDateToIST(row.original.pause_end_date)}
               </div>
             )}
           </div>
@@ -201,9 +205,14 @@ const MembershipsTable: React.FC<MembershipsTableProps> = ({
     columnHelper.accessor('created_at', {
       header: 'Created',
       cell: ({ getValue }) => (
-        <div className="flex items-center text-sm text-gray-900 dark:text-white">
-          <Calendar className="h-3 w-3 mr-1 text-gray-400" />
-          {new Date(getValue()).toLocaleDateString()}
+        <div className="space-y-1">
+          <div className="flex items-center text-sm text-gray-900 dark:text-white">
+            <Calendar className="h-3 w-3 mr-1 text-gray-400" />
+            {formatDateToIST(getValue())}
+          </div>
+          <div className="text-xs text-blue-600 dark:text-blue-400 font-medium">
+            IST
+          </div>
         </div>
       ),
     }),
