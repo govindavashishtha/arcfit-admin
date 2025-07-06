@@ -51,52 +51,6 @@ const DietPlansTable: React.FC<DietPlansTableProps> = ({
   };
 
   const columns = useMemo<ColumnDef<DietPlan, any>[]>(() => [
-    columnHelper.accessor('user', {
-      id: 'user',
-      header: 'User',
-      cell: ({ getValue }) => {
-        const user = getValue();
-        
-        // Handle case where user might be undefined
-        if (!user) {
-          return (
-            <div className="flex items-center space-x-3">
-              <div className="flex-shrink-0 h-10 w-10 rounded-full bg-gray-400 flex items-center justify-center">
-                <span className="font-medium text-white text-sm">
-                  N/A
-                </span>
-              </div>
-              <div>
-                <div className="text-sm font-medium text-gray-900 dark:text-white">
-                  Unknown User
-                </div>
-                <div className="text-sm text-gray-500 dark:text-gray-400">
-                  No email available
-                </div>
-              </div>
-            </div>
-          );
-        }
-        
-        return (
-          <div className="flex items-center space-x-3">
-            <div className="flex-shrink-0 h-10 w-10 rounded-full bg-gradient-to-r from-orange-500 to-red-600 flex items-center justify-center">
-              <span className="font-medium text-white text-sm">
-                {user.first_name.charAt(0)}{user.last_name.charAt(0)}
-              </span>
-            </div>
-            <div>
-              <div className="text-sm font-medium text-gray-900 dark:text-white">
-                {user.first_name} {user.last_name}
-              </div>
-              <div className="text-sm text-gray-500 dark:text-gray-400">
-                {user.email}
-              </div>
-            </div>
-          </div>
-        );
-      },
-    }),
     columnHelper.accessor('start_date', {
       header: 'Plan Duration',
       cell: ({ row }) => (
