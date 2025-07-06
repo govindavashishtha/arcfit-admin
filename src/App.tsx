@@ -10,6 +10,7 @@ import TrainersPage from './pages/TrainersPage';
 import MembershipsPage from './pages/MembershipsPage';
 import EventsPage from './pages/EventsPage';
 import SocietyPage from './pages/SocietyPage';
+import DietPlansPage from './pages/DietPlansPage';
 import DashboardLayout from './components/layout/DashboardLayout';
 import AuthRoute from './components/routes/AuthRoute';
 import ProtectedRoute from './components/routes/ProtectedRoute';
@@ -36,6 +37,7 @@ function App() {
                   <Route path="/trainers" element={<TrainersPage />} />
                   <Route path="/memberships" element={<MembershipsPage />} />
                   <Route path="/events" element={<EventsPage />} />
+                  <Route path="/diet-plans" element={<DietPlansPage />} />
                   <Route path="/society" element={<SocietyPage />} />
                 </Route>
               </Route>
