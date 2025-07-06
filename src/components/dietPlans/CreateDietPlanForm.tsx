@@ -12,6 +12,7 @@ import {
 
 interface CreateDietPlanFormProps {
   users: Member[];
+  isLoadingUsers?: boolean;
   onSubmit: (data: CreateDietPlanData) => Promise<void>;
   onCancel: () => void;
   isLoading: boolean;
@@ -19,6 +20,7 @@ interface CreateDietPlanFormProps {
 
 const CreateDietPlanForm: React.FC<CreateDietPlanFormProps> = ({
   users,
+  isLoadingUsers = false,
   onSubmit,
   onCancel,
   isLoading
@@ -133,12 +135,19 @@ const CreateDietPlanForm: React.FC<CreateDietPlanFormProps> = ({
             Member Selection
           </h3>
           
-          <UserSelector
-            users={users}
-            selectedUserId={formData.user_id}
-            onUserSelect={handleUserSelect}
-            placeholder="Search and select a member..."
-          />
+          {isLoadingUsers ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-orange-500"></div>
+              <span className="ml-3 text-gray-500 dark:text-gray-400">Loading members...</span>
+            </div>
+          ) : (
+            <UserSelector
+              users={users}
+              selectedUserId={formData.user_id}
+              onUserSelect={handleUserSelect}
+              placeholder="Search and select a member..."
+            />
+          )}
 
           {selectedUser && (
             <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">

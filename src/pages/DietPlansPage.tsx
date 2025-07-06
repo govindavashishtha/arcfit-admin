@@ -15,7 +15,7 @@ import toast from 'react-hot-toast';
 import { useSociety } from '../contexts/SocietyContext';
 
 const DietPlansPage: React.FC = () => {
-  const { selectedSocietyId } = useSociety();
+  const { selectedSocietyId, selectedSociety } = useSociety();
   const [selectedUserId, setSelectedUserId] = useState('');
   const [showForm, setShowForm] = useState(false);
   const [dietPlanToDelete, setDietPlanToDelete] = useState<{ id: string; userId: string; userName: string } | null>(null);
@@ -25,8 +25,12 @@ const DietPlansPage: React.FC = () => {
   const deleteDietPlanMutation = useDeleteDietPlanMutation();
   
   // Fetch members for user selection
-  const { data: membersData } = useMembersQuery(
-    selectedSocietyId ? { society_id: selectedSocietyId, page: 1, limit: 1000 } : undefined
+  const { 
+    data: membersData, 
+    isLoading: membersLoading, 
+    error: membersError 
+  } = useMembersQuery(
+    selectedSocietyId ? { society_id: selectedSocietyId, page: 1, limit: 100 } : undefined
   );
 
   // Fetch diet plans for selected user
@@ -86,6 +90,7 @@ const DietPlansPage: React.FC = () => {
       <div className="space-y-6">
         <CreateDietPlanForm
           users={membersData?.data || []}
+          isLoadingUsers={membersLoading}
           onSubmit={handleCreateDietPlan}
           onCancel={handleCancelForm}
           isLoading={isFormLoading}
@@ -226,18 +231,72 @@ const DietPlansPage: React.FC = () => {
         <>
           {/* User Selection */}
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
-              Select Member to View Diet Plans
-            </h3>
-            <div className="max-w-md">
-              <UserSelector
-                users={membersData?.data || []}
-                selectedUserId={selectedUserId}
-                onUserSelect={setSelectedUserId}
-                placeholder="Search and select a member..."
-              />
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+                Select Member to View Diet Plans
+              </h3>
+              {selectedSociety && (
+                <div className="text-sm text-gray-500 dark:text-gray-400">
+                  Society: {selectedSociety.name} - {selectedSociety.city}
+                </div>
+              )}
             </div>
+            
+            {membersLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-orange-500"></div>
+                <span className="ml-3 text-gray-500 dark:text-gray-400">Loading members...</span>
+              </div>
+            ) : membersError ? (
+              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+                <div className="flex">
+                  <div className="flex-shrink-0">
+                    <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <div className="ml-3">
+                    <p className="text-sm text-red-700 dark:text-red-200">
+                      Failed to load members for this society
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="max-w-md">
+                <UserSelector
+                  users={membersData?.data || []}
+                  selectedUserId={selectedUserId}
+                  onUserSelect={setSelectedUserId}
+                  placeholder="Search and select a member..."
+                />
+                {membersData?.data.length === 0 && (
+                  <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                    No members found for this society
+                  </p>
+                )}
+              </div>
+            )}
           </div>
+
+          {/* Members Stats */}
+          {membersData && membersData.data.length > 0 && (
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <Users className="h-8 w-8 text-blue-600" />
+                </div>
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                    Total Members in {selectedSociety?.name}
+                  </p>
+                  <p className="text-2xl font-semibold text-gray-900 dark:text-white">
+                    {membersData.pagination.total}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Stats Card */}
           {selectedUserId && dietPlansData && (
