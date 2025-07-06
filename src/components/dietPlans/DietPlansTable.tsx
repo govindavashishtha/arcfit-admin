@@ -56,6 +56,28 @@ const DietPlansTable: React.FC<DietPlansTableProps> = ({
       header: 'User',
       cell: ({ getValue }) => {
         const user = getValue();
+        
+        // Handle case where user might be undefined
+        if (!user) {
+          return (
+            <div className="flex items-center space-x-3">
+              <div className="flex-shrink-0 h-10 w-10 rounded-full bg-gray-400 flex items-center justify-center">
+                <span className="font-medium text-white text-sm">
+                  N/A
+                </span>
+              </div>
+              <div>
+                <div className="text-sm font-medium text-gray-900 dark:text-white">
+                  Unknown User
+                </div>
+                <div className="text-sm text-gray-500 dark:text-gray-400">
+                  No email available
+                </div>
+              </div>
+            </div>
+          );
+        }
+        
         return (
           <div className="flex items-center space-x-3">
             <div className="flex-shrink-0 h-10 w-10 rounded-full bg-gradient-to-r from-orange-500 to-red-600 flex items-center justify-center">
@@ -97,7 +119,9 @@ const DietPlansTable: React.FC<DietPlansTableProps> = ({
       header: 'Diet Plan Document',
       cell: ({ getValue, row }) => {
         const docUrl = getValue();
-        const userName = `${row.original.user.first_name} ${row.original.user.last_name}`;
+        const userName = row.original.user 
+          ? `${row.original.user.first_name} ${row.original.user.last_name}`
+          : 'Unknown User';
         
         return (
           <div className="flex items-center space-x-2">
@@ -137,7 +161,12 @@ const DietPlansTable: React.FC<DietPlansTableProps> = ({
       cell: ({ row }) => (
         <div className="flex space-x-2">
           <button
-            onClick={() => handleViewDocument(row.original.doc_url, `${row.original.user.first_name} ${row.original.user.last_name}`)}
+            onClick={() => handleViewDocument(
+              row.original.doc_url, 
+              row.original.user 
+                ? `${row.original.user.first_name} ${row.original.user.last_name}`
+                : 'Unknown User'
+            )}
             className="p-2 text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
             title="View document"
           >
