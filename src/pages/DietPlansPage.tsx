@@ -30,7 +30,7 @@ const DietPlansPage: React.FC = () => {
     isLoading: membersLoading, 
     error: membersError 
   } = useMembersQuery(
-    selectedSocietyId ? { society_id: selectedSocietyId, page: 1, limit: 1000 } : undefined
+    selectedSocietyId ? { society_id: selectedSocietyId } : undefined
   );
 
   // Fetch diet plans for selected user

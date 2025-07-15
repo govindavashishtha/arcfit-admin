@@ -309,7 +309,7 @@ const CreateDietPlanForm: React.FC<CreateDietPlanFormProps> = ({
           </button>
         </div>
       </form>
-    </div>
+    selectedSocietyId ? { society_id: selectedSocietyId } : undefined
   );
 };
 
