@@ -88,6 +88,7 @@ const MembershipsTable: React.FC<MembershipsTableProps> = ({
       cell: ({ getValue, row }) => {
         const type = getValue();
         const typeLabels = {
+          '1D': '1 Day',
           '15D': '15 Days',
           '1M': '1 Month',
           '3M': '3 Months',

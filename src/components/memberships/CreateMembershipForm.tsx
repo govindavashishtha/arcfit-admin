@@ -49,6 +49,7 @@ const CreateMembershipForm: React.FC<CreateMembershipFormProps> = ({
   const selectedSociety = societies.find(s => s.society_id === selectedSocietyId);
 
   const membershipTypes = [
+    { value: '1D', label: '1 Day', defaultPrice: 269 },
     { value: '15D', label: '15 Days', defaultPrice: 1799 },
     { value: '1M', label: '1 Month', defaultPrice: 2999 },
     { value: '3M', label: '3 Months', defaultPrice: 7500 },
@@ -82,7 +83,10 @@ const CreateMembershipForm: React.FC<CreateMembershipFormProps> = ({
       let isPauseAllowed = false;
       let maxPauseDays = 0;
 
-      if (formData.type === '6M') {
+      if (formData.type === '1D' || formData.type === '15D') {
+        isPauseAllowed = false;
+        maxPauseDays = 0;
+      } else if (formData.type === '6M') {
         isPauseAllowed = true;
         maxPauseDays = 15;
       } else if (formData.type === '12M') {

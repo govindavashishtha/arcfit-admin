@@ -9,7 +9,7 @@ export interface User {
 export interface Membership {
   membership_id: string;
   user_id: string;
-  type: '15D' | '1M' | '3M' | '6M' | '12M';
+  type: '1D' | '15D' | '1M' | '3M' | '6M' | '12M';
   start_date: string;
   end_date: string;
   transaction_id: string;
@@ -26,7 +26,7 @@ export interface Membership {
 
 export interface CreateMembershipData {
   user_id: string;
-  type: '15D' | '1M' | '3M' | '6M' | '12M';
+  type: '1D' | '15D' | '1M' | '3M' | '6M' | '12M';
   transaction_id: string;
   is_paused_allowed: boolean;
   max_allowed_pause_days: number;
