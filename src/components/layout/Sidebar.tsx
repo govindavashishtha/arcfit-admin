@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import { Users, UserCheck, Building, LayoutDashboard, CreditCard, Calendar, FileText, Menu, X } from 'lucide-react';
+import { Users, UserCheck, Building, LayoutDashboard, CreditCard, Calendar, FileText, Tag, Menu, X } from 'lucide-react';
 import useAuth from '../../hooks/useAuth';
 import SocietySelector from './SocietySelector';
 
@@ -46,6 +46,11 @@ const Sidebar: React.FC<SidebarProps> = ({ isMobile }) => {
       name: 'Diet Plans',
       path: '/diet-plans',
       icon: <FileText className="w-5 h-5" />,
+    },
+    {
+      name: 'Subscription Plans',
+      path: '/subscription-plans',
+      icon: <Tag className="w-5 h-5" />,
     },
     {
       name: 'Society',

@@ -6,6 +6,7 @@ export * from './useTrainerQueries';
 export * from './useMembershipQueries';
 export * from './useEventQueries';
 export * from './useDietPlanQueries';
+export * from './useSubscriptionPlanQueries';
 
 // Export query keys for external use
 export { authKeys } from './useAuthQueries';
@@ -15,3 +16,4 @@ export { trainerKeys } from './useTrainerQueries';
 export { membershipKeys } from './useMembershipQueries';
 export { eventKeys } from './useEventQueries';
 export { dietPlanKeys } from './useDietPlanQueries';
+export { subscriptionPlanKeys } from './useSubscriptionPlanQueries';
