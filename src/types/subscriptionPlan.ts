@@ -31,3 +31,18 @@ export interface SubscriptionPlanFilters {
   type?: string;
   search?: string;
 }
+
+export interface CreateSubscriptionPlanData {
+  society_id: string;
+  name: string;
+  type: '1D' | '15D' | '1M' | '3M' | '6M' | '12M';
+  description: string;
+  features: SubscriptionPlanFeatures;
+  original_amount: number;
+  payable_amount: number;
+  pay_online: 0 | 1;
+}
+
+export interface UpdateSubscriptionPlanData extends Partial<CreateSubscriptionPlanData> {
+  id: string;
+}

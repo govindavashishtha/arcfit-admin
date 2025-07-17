@@ -1,16 +1,33 @@
 import React, { useState, useEffect } from 'react';
 import { Tag, Plus } from 'lucide-react';
-import { useSubscriptionPlansQuery } from '../hooks/queries/useSubscriptionPlanQueries';
-import { SubscriptionPlanFilters as SubscriptionPlanFiltersType, SubscriptionPlanQueryParams } from '../types/subscriptionPlan';
+import { 
+  useSubscriptionPlansQuery, 
+  useCreateSubscriptionPlanMutation, 
+  useUpdateSubscriptionPlanMutation, 
+  useDeleteSubscriptionPlanMutation 
+} from '../hooks/queries/useSubscriptionPlanQueries';
+import { 
+  SubscriptionPlanFilters as SubscriptionPlanFiltersType, 
+  SubscriptionPlanQueryParams, 
+  SubscriptionPlan,
+  CreateSubscriptionPlanData
+} from '../types/subscriptionPlan';
 import SubscriptionPlanFilters from '../components/subscriptionPlans/SubscriptionPlanFilters';
 import SubscriptionPlansTable from '../components/subscriptionPlans/SubscriptionPlansTable';
+import SubscriptionPlanForm from '../components/subscriptionPlans/SubscriptionPlanForm';
+import ConfirmationModal from '../components/ui/ConfirmationModal';
 import { useSociety } from '../contexts/SocietyContext';
+import toast from 'react-hot-toast';
+import { AlertTriangle } from 'lucide-react';
 
 const SubscriptionPlansPage: React.FC = () => {
   const { selectedSocietyId, selectedSociety } = useSociety();
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize] = useState(10);
   const [filters, setFilters] = useState<SubscriptionPlanFiltersType>({});
+  const [showForm, setShowForm] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlan | null>(null);
+  const [planToDelete, setPlanToDelete] = useState<SubscriptionPlan | null>(null);
 
   // Build query parameters
   const queryParams: SubscriptionPlanQueryParams = {
@@ -26,6 +43,10 @@ const SubscriptionPlansPage: React.FC = () => {
     error,
     refetch 
   } = useSubscriptionPlansQuery(queryParams);
+  
+  const createPlanMutation = useCreateSubscriptionPlanMutation();
+  const updatePlanMutation = useUpdateSubscriptionPlanMutation();
+  const deletePlanMutation = useDeleteSubscriptionPlanMutation();
 
   // Reset page when filters change
   useEffect(() => {
@@ -57,6 +78,87 @@ const SubscriptionPlansPage: React.FC = () => {
     return true;
   }) || [];
 
+  const handleCreatePlan = async (data: CreateSubscriptionPlanData) => {
+    try {
+      await createPlanMutation.mutateAsync(data);
+      toast.success('Subscription plan created successfully!');
+      setShowForm(false);
+      setSelectedPlan(null);
+    } catch (error) {
+      console.error('Failed to create subscription plan:', error);
+      toast.error('Failed to create subscription plan');
+      throw error;
+    }
+  };
+
+  const handleUpdatePlan = async (data: CreateSubscriptionPlanData) => {
+    if (!selectedPlan) return;
+
+    try {
+      await updatePlanMutation.mutateAsync({
+        id: selectedPlan.id,
+        ...data
+      });
+      toast.success('Subscription plan updated successfully!');
+      setShowForm(false);
+      setSelectedPlan(null);
+    } catch (error) {
+      console.error('Failed to update subscription plan:', error);
+      toast.error('Failed to update subscription plan');
+      throw error;
+    }
+  };
+
+  const handleEditPlan = (plan: SubscriptionPlan) => {
+    setSelectedPlan(plan);
+    setShowForm(true);
+  };
+
+  const handleDeletePlan = (planId: string) => {
+    const plan = subscriptionPlansData?.items.find(p => p.id === planId);
+    if (plan) {
+      setPlanToDelete(plan);
+    }
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!planToDelete) return;
+
+    try {
+      await deletePlanMutation.mutateAsync(planToDelete.id);
+      toast.success('Subscription plan deleted successfully!');
+      setPlanToDelete(null);
+    } catch (error) {
+      console.error('Failed to delete subscription plan:', error);
+      toast.error('Failed to delete subscription plan');
+    }
+  };
+
+  const handleAddPlan = () => {
+    setSelectedPlan(null);
+    setShowForm(true);
+  };
+
+  const handleCancelForm = () => {
+    setShowForm(false);
+    setSelectedPlan(null);
+  };
+
+  const isFormLoading = createPlanMutation.isPending || updatePlanMutation.isPending;
+
+  if (showForm) {
+    return (
+      <div className="space-y-6">
+        <SubscriptionPlanForm
+          initialData={selectedPlan || undefined}
+          onSubmit={selectedPlan ? handleUpdatePlan : handleCreatePlan}
+          onCancel={handleCancelForm}
+          isLoading={isFormLoading}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -69,6 +171,17 @@ const SubscriptionPlansPage: React.FC = () => {
           <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
             Manage subscription plans for your society
           </p>
+        </div>
+        
+        <div className="mt-4 lg:mt-0">
+          <button
+            onClick={handleAddPlan}
+            disabled={!selectedSocietyId}
+            className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:bg-indigo-300 disabled:cursor-not-allowed"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Create Plan
+          </button>
         </div>
       </div>
 
@@ -230,6 +343,8 @@ const SubscriptionPlansPage: React.FC = () => {
           <SubscriptionPlansTable
             data={filteredData}
             isLoading={isLoading}
+            onEdit={handleEditPlan}
+            onDelete={handleDeletePlan}
           />
 
           {/* Server-side Pagination */}
@@ -298,6 +413,20 @@ const SubscriptionPlansPage: React.FC = () => {
           )}
         </>
       )}
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmationModal
+        open={!!planToDelete}
+        onClose={() => setPlanToDelete(null)}
+        onConfirm={handleConfirmDelete}
+        title="Delete Subscription Plan"
+        message={`Are you sure you want to delete the subscription plan "${planToDelete?.name}"?\n\nThis action cannot be undone and will remove the plan from your society's offerings.`}
+        confirmText="Delete Plan"
+        cancelText="Keep Plan"
+        confirmColor="error"
+        isLoading={deletePlanMutation.isPending}
+        icon={<AlertTriangle size={28} color="#dc2626" />}
+      />
     </div>
   );
 };

@@ -23,20 +23,26 @@ import {
   Tag,
   Star,
   Globe,
-  CheckCircle
+  CheckCircle,
+  Edit2,
+  Trash2
 } from 'lucide-react';
 import { formatDateToIST } from '../../utils/dateUtils';
 
 interface SubscriptionPlansTableProps {
   data: SubscriptionPlan[];
   isLoading: boolean;
+  onEdit?: (plan: SubscriptionPlan) => void;
+  onDelete?: (planId: string) => void;
 }
 
 const columnHelper = createColumnHelper<SubscriptionPlan>();
 
 const SubscriptionPlansTable: React.FC<SubscriptionPlansTableProps> = ({
   data,
-  isLoading
+  isLoading,
+  onEdit,
+  onDelete
 }) => {
   const columns = useMemo<ColumnDef<SubscriptionPlan, any>[]>(() => [
     columnHelper.accessor('name', {
@@ -156,7 +162,34 @@ const SubscriptionPlansTable: React.FC<SubscriptionPlansTableProps> = ({
         </div>
       ),
     }),
-  ], []);
+    // Actions column
+    columnHelper.display({
+      id: 'actions',
+      header: 'Actions',
+      cell: ({ row }) => (
+        <div className="flex space-x-2">
+          {onEdit && (
+            <button
+              onClick={() => onEdit(row.original)}
+              className="p-2 text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
+              title="Edit subscription plan"
+            >
+              <Edit2 className="h-4 w-4" />
+            </button>
+          )}
+          {onDelete && (
+            <button
+              onClick={() => onDelete(row.original.id)}
+              className="p-2 text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+              title="Delete subscription plan"
+            >
+              <Trash2 className="h-4 w-4" />
+            </button>
+          )}
+        </div>
+      ),
+    }),
+  ], [onEdit, onDelete]);
 
   const table = useReactTable({
     data,

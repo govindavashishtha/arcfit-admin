@@ -1,11 +1,16 @@
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { 
   SubscriptionPlan, 
-  SubscriptionPlanQueryParams 
+  SubscriptionPlanQueryParams,
+  CreateSubscriptionPlanData,
+  UpdateSubscriptionPlanData
 } from '../../types/subscriptionPlan';
 import { 
   getAllSubscriptionPlans, 
-  getSubscriptionPlanById 
+  getSubscriptionPlanById,
+  createSubscriptionPlan,
+  updateSubscriptionPlan,
+  deleteSubscriptionPlan
 } from '../../api/subscriptionPlansApi';
 
 // Query Keys
@@ -46,5 +51,74 @@ export const useSubscriptionPlanQuery = (id: string) => {
     },
     enabled: !!id,
     staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+};
+
+// Create Subscription Plan Mutation
+export const useCreateSubscriptionPlanMutation = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async (data: CreateSubscriptionPlanData) => {
+      const response = await createSubscriptionPlan(data);
+      if (!response.success) {
+        throw new Error('Failed to create subscription plan');
+      }
+      return response.data;
+    },
+    onSuccess: () => {
+      // Invalidate and refetch subscription plans list
+      queryClient.invalidateQueries({ queryKey: subscriptionPlanKeys.lists() });
+    },
+    onError: (error) => {
+      console.error('Create subscription plan error:', error);
+    },
+  });
+};
+
+// Update Subscription Plan Mutation
+export const useUpdateSubscriptionPlanMutation = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async (data: UpdateSubscriptionPlanData) => {
+      const response = await updateSubscriptionPlan(data);
+      if (!response.success) {
+        throw new Error('Failed to update subscription plan');
+      }
+      return response.data;
+    },
+    onSuccess: (data, variables) => {
+      // Update the specific subscription plan in cache
+      queryClient.setQueryData(subscriptionPlanKeys.detail(variables.id), data);
+      
+      // Invalidate and refetch subscription plans list
+      queryClient.invalidateQueries({ queryKey: subscriptionPlanKeys.lists() });
+    },
+    onError: (error) => {
+      console.error('Update subscription plan error:', error);
+    },
+  });
+};
+
+// Delete Subscription Plan Mutation
+export const useDeleteSubscriptionPlanMutation = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async (id: string) => {
+      await deleteSubscriptionPlan(id);
+      return id;
+    },
+    onSuccess: (deletedId) => {
+      // Remove the deleted subscription plan from cache
+      queryClient.removeQueries({ queryKey: subscriptionPlanKeys.detail(deletedId) });
+      
+      // Invalidate and refetch subscription plans list
+      queryClient.invalidateQueries({ queryKey: subscriptionPlanKeys.lists() });
+    },
+    onError: (error) => {
+      console.error('Delete subscription plan error:', error);
+    },
   });
 };
