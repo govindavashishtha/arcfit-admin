@@ -12,6 +12,8 @@ export interface SubscriptionPlan {
   original_amount: number;
   payable_amount: number;
   pay_online: number;
+  is_paused_allowed: boolean;
+  max_allowed_pause_days: number;
   created_at: string;
   updated_at: string;
 }
@@ -41,6 +43,8 @@ export interface CreateSubscriptionPlanData {
   original_amount: number;
   payable_amount: number;
   pay_online: 0 | 1;
+  is_paused_allowed: boolean;
+  max_allowed_pause_days: number;
 }
 
 export interface UpdateSubscriptionPlanData extends Partial<CreateSubscriptionPlanData> {

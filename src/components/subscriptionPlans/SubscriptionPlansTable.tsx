@@ -25,7 +25,9 @@ import {
   Globe,
   CheckCircle,
   Edit2,
-  Trash2
+  Trash2,
+  Pause,
+  Clock
 } from 'lucide-react';
 import { formatDateToIST } from '../../utils/dateUtils';
 

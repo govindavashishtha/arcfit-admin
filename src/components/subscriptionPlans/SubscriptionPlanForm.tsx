@@ -9,7 +9,9 @@ import {
   Calendar,
   Globe,
   ArrowLeft,
-  Building
+  Building,
+  Pause,
+  Clock
 } from 'lucide-react';
 
 interface SubscriptionPlanFormProps {
@@ -35,7 +37,9 @@ const SubscriptionPlanForm: React.FC<SubscriptionPlanFormProps> = ({
     features: {},
     original_amount: 0,
     payable_amount: 0,
-    pay_online: 1
+    pay_online: 1,
+    is_paused_allowed: false,
+    max_allowed_pause_days: 0
   });
 
   const [error, setError] = useState<string>('');
@@ -59,7 +63,9 @@ const SubscriptionPlanForm: React.FC<SubscriptionPlanFormProps> = ({
         features: initialData.features,
         original_amount: initialData.original_amount,
         payable_amount: initialData.payable_amount,
-        pay_online: initialData.pay_online
+        pay_online: initialData.pay_online,
+        is_paused_allowed: initialData.is_paused_allowed,
+        max_allowed_pause_days: initialData.max_allowed_pause_days
       });
     } else {
       // Set society_id for new plans
@@ -77,6 +83,16 @@ const SubscriptionPlanForm: React.FC<SubscriptionPlanFormProps> = ({
       setFormData(prev => ({ ...prev, [name]: parseFloat(value) || 0 }));
     } else if (name === 'pay_online') {
       setFormData(prev => ({ ...prev, [name]: parseInt(value) as 0 | 1 }));
+    } else if (name === 'is_paused_allowed') {
+      const isPauseAllowed = value === 'true';
+      setFormData(prev => ({ 
+        ...prev, 
+        [name]: isPauseAllowed,
+        // Reset pause days if pause is disabled
+        max_allowed_pause_days: isPauseAllowed ? prev.max_allowed_pause_days : 0
+      }));
+    } else if (name === 'max_allowed_pause_days') {
+      setFormData(prev => ({ ...prev, [name]: parseInt(value) || 0 }));
     } else {
       setFormData(prev => ({ ...prev, [name]: value }));
     }
@@ -337,6 +353,79 @@ const SubscriptionPlanForm: React.FC<SubscriptionPlanFormProps> = ({
             <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
               Choose whether customers can pay online or need to pay offline
             </p>
+          </div>
+        </div>
+
+        {/* Pause Settings */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white flex items-center">
+            <Pause className="h-5 w-5 mr-2" />
+            Pause Settings
+          </h3>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                Allow Pause *
+              </label>
+              <select
+                name="is_paused_allowed"
+                value={formData.is_paused_allowed.toString()}
+                onChange={handleChange}
+                required
+                className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+              >
+                <option value="false">No - Pause Not Allowed</option>
+                <option value="true">Yes - Pause Allowed</option>
+              </select>
+              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                Whether subscribers can pause their subscription
+              </p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                Max Pause Days *
+              </label>
+              <input
+                type="number"
+                name="max_allowed_pause_days"
+                value={formData.max_allowed_pause_days}
+                onChange={handleChange}
+                required
+                min="0"
+                max="365"
+                disabled={!formData.is_paused_allowed}
+                className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-600 disabled:cursor-not-allowed"
+              />
+              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                Maximum days a subscription can be paused (0 if pause not allowed)
+              </p>
+            </div>
+          </div>
+
+          {/* Pause Settings Preview */}
+          <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+            <h4 className="text-sm font-medium text-gray-900 dark:text-white flex items-center mb-2">
+              <Clock className="h-4 w-4 mr-2" />
+              Pause Policy Preview
+            </h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+              <div className="flex items-center">
+                <div className={`w-4 h-4 rounded-full mr-2 ${
+                  formData.is_paused_allowed ? 'bg-green-500' : 'bg-red-500'
+                }`}></div>
+                <span className="text-gray-700 dark:text-gray-300">
+                  Pause Status: {formData.is_paused_allowed ? 'Allowed' : 'Not Allowed'}
+                </span>
+              </div>
+              <div className="flex items-center">
+                <Clock className="h-4 w-4 mr-2 text-gray-400" />
+                <span className="text-gray-700 dark:text-gray-300">
+                  Max Days: {formData.max_allowed_pause_days} {formData.max_allowed_pause_days === 1 ? 'day' : 'days'}
+                </span>
+              </div>
+            </div>
           </div>
         </div>
 
