@@ -150,6 +150,30 @@ const SubscriptionPlansTable: React.FC<SubscriptionPlansTableProps> = ({
         </div>
       ),
     }),
+    columnHelper.accessor('is_paused_allowed', {
+      header: 'Pause Policy',
+      cell: ({ getValue, row }) => {
+        const isPauseAllowed = getValue();
+        return (
+          <div className="space-y-1">
+            <div className={`flex items-center text-xs ${
+              isPauseAllowed ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
+            }`}>
+              <div className={`w-2 h-2 rounded-full mr-2 ${
+                isPauseAllowed ? 'bg-green-500' : 'bg-red-500'
+              }`}></div>
+              {isPauseAllowed ? 'Allowed' : 'Not Allowed'}
+            </div>
+            {isPauseAllowed && (
+              <div className="flex items-center text-xs text-gray-500 dark:text-gray-400">
+                <Clock className="h-3 w-3 mr-1" />
+                Max: {row.original.max_allowed_pause_days} {row.original.max_allowed_pause_days === 1 ? 'day' : 'days'}
+              </div>
+            )}
+          </div>
+        );
+      },
+    }),
     columnHelper.accessor('created_at', {
       header: 'Created',
       cell: ({ getValue }) => (
