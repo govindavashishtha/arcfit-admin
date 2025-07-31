@@ -64,8 +64,8 @@ const SubscriptionPlanForm: React.FC<SubscriptionPlanFormProps> = ({
         original_amount: initialData.original_amount,
         payable_amount: initialData.payable_amount,
         pay_online: initialData.pay_online,
-        is_paused_allowed: initialData.is_paused_allowed,
-        max_allowed_pause_days: initialData.max_allowed_pause_days
+        is_paused_allowed: initialData.is_paused_allowed || false,
+        max_allowed_pause_days: initialData.max_allowed_pause_days || 0
       });
     } else {
       // Set society_id for new plans
@@ -370,7 +370,7 @@ const SubscriptionPlanForm: React.FC<SubscriptionPlanFormProps> = ({
               </label>
               <select
                 name="is_paused_allowed"
-                value={formData.is_paused_allowed.toString()}
+                value={formData.is_paused_allowed ? 'true' : 'false'}
                 onChange={handleChange}
                 required
                 className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
@@ -390,7 +390,7 @@ const SubscriptionPlanForm: React.FC<SubscriptionPlanFormProps> = ({
               <input
                 type="number"
                 name="max_allowed_pause_days"
-                value={formData.max_allowed_pause_days}
+                value={formData.max_allowed_pause_days || 0}
                 onChange={handleChange}
                 required
                 min="0"
