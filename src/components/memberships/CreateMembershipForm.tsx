@@ -36,7 +36,9 @@ const CreateMembershipForm: React.FC<CreateMembershipFormProps> = ({
     is_paused_allowed: false,
     max_allowed_pause_days: 0,
     payment_amount: 0,
-    payment_method: 'upi'
+    payment_method: 'upi',
+    additional_days: 0
+    additional_days: 0
   });
 
   const [error, setError] = useState<string>('');
@@ -118,7 +120,7 @@ const CreateMembershipForm: React.FC<CreateMembershipFormProps> = ({
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     
-    if (name === 'payment_amount') {
+    if (name === 'payment_amount' || name === 'additional_days') {
       setFormData(prev => ({ ...prev, [name]: parseFloat(value) || 0 }));
     } else {
       setFormData(prev => ({ ...prev, [name]: value }));
@@ -340,6 +342,33 @@ const CreateMembershipForm: React.FC<CreateMembershipFormProps> = ({
                 ))}
               </select>
             </div>
+          </div>
+        </div>
+
+        {/* Additional Settings */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white flex items-center">
+            <Clock className="h-5 w-5 mr-2" />
+            Additional Settings
+          </h3>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              Additional Days
+            </label>
+            <input
+              type="number"
+              name="additional_days"
+              value={formData.additional_days}
+              onChange={handleChange}
+              min="0"
+              max="365"
+              className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+              placeholder="0"
+            />
+            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+              Extra days to add to the membership duration (0-365 days)
+            </p>
           </div>
         </div>
 
