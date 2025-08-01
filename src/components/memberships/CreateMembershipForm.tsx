@@ -38,7 +38,6 @@ const CreateMembershipForm: React.FC<CreateMembershipFormProps> = ({
     payment_amount: 0,
     payment_method: 'upi',
     additional_days: 0
-    additional_days: 0
   });
 
   const [error, setError] = useState<string>('');
