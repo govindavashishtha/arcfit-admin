@@ -133,16 +133,26 @@ const EventsTable: React.FC<EventsTableProps> = ({
       cell: ({ row }) => {
         // Format date to IST but use start_time and end_time directly as they're already in IST
         const date = formatDateToIST(row.original.date);
-        const startTime = new Date(row.original.start_time).toLocaleTimeString('en-IN', { 
-          hour: '2-digit', 
-          minute: '2-digit', 
-          hour12: true 
-        });
-        const endTime = new Date(row.original.end_time).toLocaleTimeString('en-IN', { 
-          hour: '2-digit', 
-          minute: '2-digit', 
-          hour12: true 
-        });
+        // Extract time directly from ISO string since it's already in IST
+        const startTimeISO = row.original.start_time; // "2025-08-08T06:00:00Z"
+        const endTimeISO = row.original.end_time; // "2025-08-08T07:00:00Z"
+        
+        // Parse time from ISO string directly (T06:00:00Z -> 06:00)
+        const startHour = parseInt(startTimeISO.split('T')[1].split(':')[0]);
+        const startMinute = parseInt(startTimeISO.split('T')[1].split(':')[1]);
+        const endHour = parseInt(endTimeISO.split('T')[1].split(':')[0]);
+        const endMinute = parseInt(endTimeISO.split('T')[1].split(':')[1]);
+        
+        // Format to 12-hour format
+        const formatTime = (hour: number, minute: number) => {
+          const period = hour >= 12 ? 'PM' : 'AM';
+          const displayHour = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
+          const displayMinute = minute.toString().padStart(2, '0');
+          return `${displayHour}:${displayMinute} ${period}`;
+        };
+        
+        const startTime = formatTime(startHour, startMinute);
+        const endTime = formatTime(endHour, endMinute);
         
         return (
           <div className="space-y-1">
