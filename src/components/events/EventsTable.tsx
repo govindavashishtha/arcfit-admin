@@ -131,10 +131,18 @@ const EventsTable: React.FC<EventsTableProps> = ({
     columnHelper.accessor('date', {
       header: 'Date & Time',
       cell: ({ row }) => {
-        // Use IST formatting utilities
+        // Format date to IST but use start_time and end_time directly as they're already in IST
         const date = formatDateToIST(row.original.date);
-        const startTime = formatTimeToIST(row.original.start_time);
-        const endTime = formatTimeToIST(row.original.end_time);
+        const startTime = new Date(row.original.start_time).toLocaleTimeString('en-IN', { 
+          hour: '2-digit', 
+          minute: '2-digit', 
+          hour12: true 
+        });
+        const endTime = new Date(row.original.end_time).toLocaleTimeString('en-IN', { 
+          hour: '2-digit', 
+          minute: '2-digit', 
+          hour12: true 
+        });
         
         return (
           <div className="space-y-1">
