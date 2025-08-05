@@ -1,6 +1,6 @@
 // Environment configuration
 export const config = {
-  apiBaseUrl: import.meta.env.VITE_API_BASE_URL || 'https://arcfit-services-dev.arcfit.co.in',
+  apiBaseUrl: import.meta.env.VITE_API_BASE_URL || 'https://arcfit-services-prod.arcfit.co.in',
   environment: import.meta.env.VITE_APP_ENV || 'development',
   isDevelopment: import.meta.env.VITE_APP_ENV === 'development',
   isProduction: import.meta.env.VITE_APP_ENV === 'production',
