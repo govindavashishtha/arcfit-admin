@@ -132,7 +132,16 @@ const EventsTable: React.FC<EventsTableProps> = ({
       header: 'Date & Time',
       cell: ({ row }) => {
         // Format date to IST but use start_time and end_time directly as they're already in IST
-        const date = formatDateToIST(row.original.date);
+        // Format date with day name as dd/MM/yyyy AA
+        const dateObj = new Date(row.original.date);
+        const day = dateObj.toLocaleDateString('en-IN', { weekday: 'short' }); // AA (Mon, Tue, etc.)
+        const formattedDate = dateObj.toLocaleDateString('en-IN', { 
+          day: '2-digit', 
+          month: '2-digit', 
+          year: 'numeric' 
+        }); // dd/MM/yyyy
+        const date = `${formattedDate} ${day}`;
+        
         // Extract time directly from ISO string since it's already in IST
         const startTimeISO = row.original.start_time; // "2025-08-08T06:00:00Z"
         const endTimeISO = row.original.end_time; // "2025-08-08T07:00:00Z"
