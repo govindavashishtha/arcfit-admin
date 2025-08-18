@@ -1,6 +1,7 @@
 export interface Center {
   center_id: string;
   name: string;
+  type: 'society' | 'gym' | 'school' | 'corporate';
   address: string;
   city: string;
   state: string;
@@ -25,6 +26,7 @@ export interface Center {
 
 export interface CreateCenterData {
   name: string;
+  type: 'society' | 'gym' | 'school' | 'corporate';
   address: string;
   city: string;
   state: string;

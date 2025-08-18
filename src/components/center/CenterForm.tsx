@@ -17,6 +17,7 @@ const CenterForm: React.FC<CenterFormProps> = ({
 }) => {
   const [formData, setFormData] = useState<CreateCenterData>({
     name: '',
+    type: 'society',
     address: '',
     city: '',
     state: '',
@@ -45,6 +46,7 @@ const CenterForm: React.FC<CenterFormProps> = ({
     if (initialData) {
       setFormData({
         name: initialData.name,
+        type: initialData.type,
         address: initialData.address,
         city: initialData.city,
         state: initialData.state,
@@ -68,6 +70,11 @@ const CenterForm: React.FC<CenterFormProps> = ({
   }, [initialData]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
@@ -121,6 +128,24 @@ const CenterForm: React.FC<CenterFormProps> = ({
             required
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600"
           />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            Type
+          </label>
+          <select
+            name="type"
+            value={formData.type}
+            onChange={handleSelectChange}
+            required
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600"
+          >
+            <option value="society">Society</option>
+            <option value="gym">Gym</option>
+            <option value="school">School</option>
+            <option value="corporate">Corporate</option>
+          </select>
         </div>
 
         <div>
