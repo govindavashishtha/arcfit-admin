@@ -202,7 +202,7 @@ const MembershipsPage: React.FC = () => {
       )}
 
       {/* Empty State */}
-      {!selectedSocietyId && (
+      {!selectedCenterId && (
         <>
           {/* Welcome Card */}
           <div className="bg-gradient-to-r from-purple-500 to-blue-600 rounded-lg shadow-lg overflow-hidden">
