@@ -3,12 +3,12 @@ import { Center, CreateCenterData, UpdateCenterData } from '../types/center';
 import { ApiResponse } from '../types/auth';
 
 export const getAllCenters = async (): Promise<ApiResponse<Center[]>> => {
-  const response = await api.get<ApiResponse<Center[]>>('/api/societies');
+  const response = await api.get<ApiResponse<Center[]>>('/api/centers');
   return response.data;
 };
 
 export const getCenterById = async (id: string): Promise<ApiResponse<Center>> => {
-  const response = await api.get<ApiResponse<Center>>(`/api/societies/${id}`);
+  const response = await api.get<ApiResponse<Center>>(`/api/centers/${id}`);
   return response.data;
 };
 
@@ -35,7 +35,7 @@ export const createCenter = async (data: CreateCenterData): Promise<ApiResponse<
     });
   }
 
-  const response = await api.post<ApiResponse<Center>>('/api/societies', formData, {
+  const response = await api.post<ApiResponse<Center>>('/api/centers', formData, {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
@@ -67,7 +67,7 @@ export const updateCenter = async (data: UpdateCenterData): Promise<ApiResponse<
     });
   }
 
-  const response = await api.put<ApiResponse<Center>>(`/api/societies/${center_id}`, formData, {
+  const response = await api.put<ApiResponse<Center>>(`/api/centers/${center_id}`, formData, {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
@@ -76,5 +76,5 @@ export const updateCenter = async (data: UpdateCenterData): Promise<ApiResponse<
 };
 
 export const deleteCenter = async (id: string): Promise<void> => {
-  await api.delete(`/api/societies/${id}`);
+  await api.delete(`/api/centers/${id}`);
 };
