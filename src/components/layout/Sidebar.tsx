@@ -165,16 +165,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isMobile }) => {
           </ul>
         </nav>
 
-        {/* Logout Button */}
-        <div className="absolute bottom-0 left-0 right-0 p-5">
-          <button
-            onClick={handleLogout}
-            className={`w-full flex items-center space-x-3 p-3 rounded-md transition-colors text-${isSocietyAdmin ? 'emerald' : 'blue'}-100 ${hoverBgColor} hover:text-white`}
-          >
-            <LogOut className="w-5 h-5" />
-            <span>Logout</span>
-          </button>
-        </div>
       </div>
 
       {isMobile && isOpen && (
