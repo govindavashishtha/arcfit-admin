@@ -29,7 +29,7 @@ export const useMembersQuery = (params?: MemberQueryParams) => {
       return response.data;
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
-    enabled: !!params?.society_id, // Only fetch when society is selected
+    enabled: !!params?.center_id, // Only fetch when center is selected
   });
 };
 
