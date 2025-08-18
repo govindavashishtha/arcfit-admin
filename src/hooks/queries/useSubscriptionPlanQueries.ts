@@ -33,7 +33,7 @@ export const useSubscriptionPlansQuery = (params?: SubscriptionPlanQueryParams) 
       }
       return response.data;
     },
-    enabled: !!params?.society_id, // Only fetch when society is selected
+    enabled: !!params?.center_id, // Only fetch when center is selected
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 };
