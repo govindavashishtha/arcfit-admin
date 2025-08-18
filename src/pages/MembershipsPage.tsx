@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { CreditCard, Plus } from 'lucide-react';
-import { useCreateMembershipMutation, useMembershipsBySocietyQuery } from '../hooks/queries/useMembershipQueries';
+import { useCreateMembershipMutation, useMembershipsByCenterQuery } from '../hooks/queries/useMembershipQueries';
 import { CreateMembershipData, MembershipFilters as MembershipFiltersType, MembershipQueryParams } from '../types/membership';
 import CreateMembershipForm from '../components/memberships/CreateMembershipForm';
 import MembershipFilters from '../components/memberships/MembershipFilters';

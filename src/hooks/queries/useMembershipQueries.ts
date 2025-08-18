@@ -6,7 +6,7 @@ import {
 } from '../../types/membership';
 import { 
   getAllMemberships,
-  getMembershipsBySociety, 
+  getMembershipsByCenter, 
   getMembershipById, 
   createMembership, 
   updateMembership, 
