@@ -65,6 +65,17 @@ const CenterForm: React.FC<CenterFormProps> = ({
         morning_end_time: initialData.morning_end_time,
         evening_start_time: initialData.evening_start_time,
         evening_end_time: initialData.evening_end_time,
+        facilities: (initialData?.facilities || []).join(','),
+        event_types: (initialData?.event_types || []).join(','),
+        meta_data: JSON.stringify(initialData?.meta_data || {
+          contact_person: '',
+          phone: '',
+          email: ''
+        }),
+        morning_start_time: initialData?.morning_start_time || '',
+        morning_end_time: initialData?.morning_end_time || '',
+        evening_start_time: initialData?.evening_start_time || '',
+        evening_end_time: initialData?.evening_end_time || '',
       });
     }
   }, [initialData]);
