@@ -53,8 +53,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isMobile }) => {
       icon: <Tag className="w-5 h-5" />,
     },
     {
-      name: 'Society',
-      path: '/society',
+      name: 'Center',
+      path: '/center',
       icon: <Building className="w-5 h-5" />,
     },
   ];

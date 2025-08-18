@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { CreateTrainerData, Trainer, Specialization } from '../../types/trainer';
-import { useSocietiesQuery } from '../../hooks/queries/useSocietyQueries';
+import { useCentersQuery } from '../../hooks/queries/useCenterQueries';
 import { 
   User, 
   Mail, 
@@ -27,7 +27,7 @@ const TrainerForm: React.FC<TrainerFormProps> = ({
   onCancel,
   isLoading
 }) => {
-  const { data: societies = [] } = useSocietiesQuery();
+  const { data: centers = [] } = useCentersQuery();
   
   const [formData, setFormData] = useState<CreateTrainerData>({
     first_name: '',
@@ -46,7 +46,7 @@ const TrainerForm: React.FC<TrainerFormProps> = ({
     country: 'India',
     pincode: '',
     status: 'active',
-    society_ids: []
+    center_ids: []
   });
 
   const [newCertification, setNewCertification] = useState('');
@@ -75,7 +75,7 @@ const TrainerForm: React.FC<TrainerFormProps> = ({
         country: initialData.country,
         pincode: initialData.pincode,
         status: initialData.status as 'active' | 'inactive',
-        society_ids: initialData.societies.map(s => s.society_id)
+        center_ids: initialData.centers.map(c => c.center_id)
       });
     }
   }, [initialData]);
@@ -101,11 +101,12 @@ const TrainerForm: React.FC<TrainerFormProps> = ({
   };
 
   const handleSocietyToggle = (societyId: string) => {
+  const handleCenterToggle = (centerId: string) => {
     setFormData(prev => ({
       ...prev,
-      society_ids: prev.society_ids.includes(societyId)
-        ? prev.society_ids.filter(id => id !== societyId)
-        : [...prev.society_ids, societyId]
+      center_ids: prev.center_ids.includes(centerId)
+        ? prev.center_ids.filter(id => id !== centerId)
+        : [...prev.center_ids, centerId]
     }));
   };
 
@@ -142,7 +143,8 @@ const TrainerForm: React.FC<TrainerFormProps> = ({
     }
 
     if (formData.society_ids.length === 0) {
-      setError('Please select at least one society');
+    if (formData.center_ids.length === 0) {
+      setError('Please select at least one center');
       return;
     }
 
@@ -520,47 +522,48 @@ const TrainerForm: React.FC<TrainerFormProps> = ({
         </div>
 
         {/* Society Assignment */}
+        {/* Center Assignment */}
         <div className="space-y-4">
           <h3 className="text-lg font-medium text-gray-900 dark:text-white flex items-center">
             <Building className="h-5 w-5 mr-2" />
-            Society Assignment
+            Center Assignment
           </h3>
           
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Assign to Societies * (Select multiple)
+              Assign to Centers * (Select multiple)
             </label>
             <div className="max-h-48 overflow-y-auto border border-gray-300 dark:border-gray-600 rounded-md p-3 space-y-2">
-              {societies.map((society) => (
+              {centers.map((center) => (
                 <label
-                  key={society.society_id}
+                  key={center.center_id}
                   className={`flex items-center p-2 rounded cursor-pointer transition-colors ${
-                    formData.society_ids.includes(society.society_id)
+                    formData.center_ids.includes(center.center_id)
                       ? 'bg-blue-50 dark:bg-blue-900/20'
                       : 'hover:bg-gray-50 dark:hover:bg-gray-700'
                   }`}
                 >
                   <input
                     type="checkbox"
-                    checked={formData.society_ids.includes(society.society_id)}
-                    onChange={() => handleSocietyToggle(society.society_id)}
+                    checked={formData.center_ids.includes(center.center_id)}
+                    onChange={() => handleCenterToggle(center.center_id)}
                     className="sr-only"
                   />
                   <div className={`flex-shrink-0 w-4 h-4 rounded border-2 mr-3 flex items-center justify-center ${
-                    formData.society_ids.includes(society.society_id)
+                    formData.center_ids.includes(center.center_id)
                       ? 'border-blue-500 bg-blue-500'
                       : 'border-gray-300 dark:border-gray-600'
                   }`}>
-                    {formData.society_ids.includes(society.society_id) && (
+                    {formData.center_ids.includes(center.center_id) && (
                       <Check className="w-3 h-3 text-white" />
                     )}
                   </div>
                   <div>
                     <div className="text-sm font-medium text-gray-900 dark:text-white">
-                      {society.name}
+                      {center.name}
                     </div>
                     <div className="text-xs text-gray-500 dark:text-gray-400">
-                      {society.city}, {society.state}
+                      {center.city}, {center.state}
                     </div>
                   </div>
                 </label>

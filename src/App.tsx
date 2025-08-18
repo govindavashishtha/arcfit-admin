@@ -2,14 +2,14 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryProvider } from './providers/QueryProvider';
 import { AuthProvider } from './contexts/AuthContext';
-import { SocietyProvider } from './contexts/SocietyContext';
+import { CenterProvider } from './contexts/CenterContext';
 import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
 import MembersPage from './pages/MembersPage';
 import TrainersPage from './pages/TrainersPage';
 import MembershipsPage from './pages/MembershipsPage';
 import EventsPage from './pages/EventsPage';
-import SocietyPage from './pages/SocietyPage';
+import CenterPage from './pages/CenterPage';
 import DietPlansPage from './pages/DietPlansPage';
 import SubscriptionPlansPage from './pages/SubscriptionPlansPage';
 import DashboardLayout from './components/layout/DashboardLayout';
@@ -22,7 +22,7 @@ function App() {
   return (
     <QueryProvider>
       <AuthProvider>
-        <SocietyProvider>
+        <CenterProvider>
           <Router>
             <Routes>
               {/* Public routes */}
@@ -39,7 +39,7 @@ function App() {
                   <Route path="/memberships" element={<MembershipsPage />} />
                   <Route path="/events" element={<EventsPage />} />
                   <Route path="/diet-plans" element={<DietPlansPage />} />
-                  <Route path="/society" element={<SocietyPage />} />
+                  <Route path="/center" element={<CenterPage />} />
                   <Route path="/subscription-plans" element={<SubscriptionPlansPage />} />
                 </Route>
               </Route>
@@ -52,7 +52,7 @@ function App() {
             </Routes>
           </Router>
           <Toast />
-        </SocietyProvider>
+        </CenterProvider>
       </AuthProvider>
     </QueryProvider>
   );

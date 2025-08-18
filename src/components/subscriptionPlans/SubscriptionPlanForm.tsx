@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { CreateSubscriptionPlanData, SubscriptionPlan } from '../../types/subscriptionPlan';
-import { useSociety } from '../../contexts/SocietyContext';
+import { useCenter } from '../../contexts/CenterContext';
 import FeaturesEditor from './FeaturesEditor';
 import { 
   Tag, 
@@ -27,10 +27,10 @@ const SubscriptionPlanForm: React.FC<SubscriptionPlanFormProps> = ({
   onCancel,
   isLoading
 }) => {
-  const { selectedSocietyId, selectedSociety } = useSociety();
+  const { selectedCenterId, selectedCenter } = useCenter();
   
   const [formData, setFormData] = useState<CreateSubscriptionPlanData>({
-    society_id: selectedSocietyId || '',
+    center_id: selectedCenterId || '',
     name: '',
     type: '1M',
     description: '',
@@ -56,7 +56,7 @@ const SubscriptionPlanForm: React.FC<SubscriptionPlanFormProps> = ({
   useEffect(() => {
     if (initialData) {
       setFormData({
-        society_id: initialData.society_id,
+        center_id: initialData.center_id,
         name: initialData.name,
         type: initialData.type,
         description: initialData.description,
@@ -71,10 +71,10 @@ const SubscriptionPlanForm: React.FC<SubscriptionPlanFormProps> = ({
       // Set society_id for new plans
       setFormData(prev => ({
         ...prev,
-        society_id: selectedSocietyId || ''
+        center_id: selectedCenterId || ''
       }));
     }
-  }, [initialData, selectedSocietyId]);
+  }, [initialData, selectedCenterId]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -107,8 +107,8 @@ const SubscriptionPlanForm: React.FC<SubscriptionPlanFormProps> = ({
     setError('');
 
     // Validation
-    if (!formData.society_id) {
-      setError('Society is required');
+    if (!formData.center_id) {
+      setError('Center is required');
       return;
     }
 
@@ -162,7 +162,7 @@ const SubscriptionPlanForm: React.FC<SubscriptionPlanFormProps> = ({
               {initialData ? 'Edit Subscription Plan' : 'Create New Subscription Plan'}
             </h2>
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              {initialData ? 'Update subscription plan details' : 'Create a new subscription plan for your society'}
+              {initialData ? 'Update subscription plan details' : 'Create a new subscription plan for your center'}
             </p>
           </div>
           <button
@@ -177,15 +177,16 @@ const SubscriptionPlanForm: React.FC<SubscriptionPlanFormProps> = ({
 
       <form onSubmit={handleSubmit} className="p-6 space-y-6">
         {/* Society Info */}
+        {/* Center Info */}
         <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
           <div className="flex items-center">
             <Building className="h-5 w-5 text-blue-600 dark:text-blue-400 mr-2" />
             <div>
               <h3 className="text-sm font-medium text-blue-900 dark:text-blue-100">
-                Selected Society
+                Selected Center
               </h3>
               <p className="text-sm text-blue-700 dark:text-blue-300">
-                {selectedSociety?.name} - {selectedSociety?.city}
+                {selectedCenter?.name} - {selectedCenter?.city}
               </p>
             </div>
           </div>

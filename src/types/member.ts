@@ -15,8 +15,8 @@ export interface Member {
   city: string;
   pincode: string;
   created_at: string;
-  society_id: string;
-  society_name: string;
+  center_id: string;
+  center_name: string;
   badge_score: number;
   reward_points: number;
   yoga_points: number;
@@ -25,7 +25,7 @@ export interface Member {
 }
 
 export interface MemberFilters {
-  society_id?: string;
+  center_id?: string;
   status?: string;
   gender?: string;
   verification_status?: string;
@@ -45,7 +45,7 @@ export interface PaginatedMembersResponse {
 export interface MemberQueryParams {
   page?: number;
   limit?: number;
-  society_id?: string;
+  center_id?: string;
   status?: string;
   gender?: string;
   verification_status?: string;

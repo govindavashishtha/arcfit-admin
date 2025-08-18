@@ -12,8 +12,8 @@ export interface EventMetaData {
   pictures?: string[]
 }
 
-export interface EventSociety {
-  society_id: string
+export interface EventCenter {
+  center_id: string
   name: string
 }
 
@@ -27,8 +27,8 @@ export interface EventTrainer {
 
 export interface Event {
   event_id: string
-  society_id: string
-  society: EventSociety
+  center_id: string
+  center: EventCenter
   trainer_id: string
   trainer: EventTrainer
   type: string
@@ -44,7 +44,7 @@ export interface Event {
 }
 
 export interface EventFilters {
-  society_id?: string
+  center_id?: string
   type?: string
   status?: string
   from_date?: string
@@ -54,7 +54,7 @@ export interface EventFilters {
 export interface EventQueryParams {
   page?: number
   limit?: number
-  society_id?: string
+  center_id?: string
   type?: string
   status?: string
   from_date?: string

@@ -4,7 +4,7 @@ export interface SubscriptionPlanFeatures {
 
 export interface SubscriptionPlan {
   id: string;
-  society_id: string;
+  center_id: string;
   name: string;
   type: '1D' | '15D' | '1M' | '3M' | '6M' | '12M';
   description: string;
@@ -21,7 +21,7 @@ export interface SubscriptionPlan {
 export interface SubscriptionPlanQueryParams {
   page?: number;
   limit?: number;
-  society_id?: string;
+  center_id?: string;
 }
 
 export interface PaginatedSubscriptionPlansResponse {
@@ -35,7 +35,7 @@ export interface SubscriptionPlanFilters {
 }
 
 export interface CreateSubscriptionPlanData {
-  society_id: string;
+  center_id: string;
   name: string;
   type: '1D' | '15D' | '1M' | '3M' | '6M' | '12M';
   description: string;

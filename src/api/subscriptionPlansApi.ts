@@ -13,7 +13,7 @@ export const getAllSubscriptionPlans = async (params?: SubscriptionPlanQueryPara
   
   if (params?.page) queryParams.append('page', params.page.toString());
   if (params?.limit) queryParams.append('limit', params.limit.toString());
-  if (params?.society_id) queryParams.append('society_id', params.society_id);
+  if (params?.center_id) queryParams.append('center_id', params.center_id);
 
   const response = await api.get<ApiResponse<PaginatedSubscriptionPlansResponse>>(`/api/subscription-plans?${queryParams.toString()}`);
   return response.data;

@@ -1,5 +1,5 @@
-export interface Society {
-  society_id: string;
+export interface Center {
+  center_id: string;
   name: string;
 }
 
@@ -26,13 +26,13 @@ export interface Trainer {
   country: string;
   pincode: string;
   created_at: string;
-  societies: Society[];
+  centers: Center[];
 }
 
 export interface TrainerFilters {
   specialization?: Specialization;
   status?: string;
-  society_id?: string;
+  center_id?: string;
   search?: string;
 }
 
@@ -51,7 +51,7 @@ export interface TrainerQueryParams {
   limit?: number;
   specialization?: Specialization;
   status?: string;
-  society_id?: string;
+  center_id?: string;
   search?: string;
 }
 
@@ -72,7 +72,7 @@ export interface CreateTrainerData {
   country: string;
   pincode: string;
   status: 'active' | 'inactive';
-  society_ids: string[];
+  center_ids: string[];
 }
 
 export interface UpdateTrainerData extends Partial<CreateTrainerData> {

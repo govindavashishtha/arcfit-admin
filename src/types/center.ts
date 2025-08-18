@@ -1,5 +1,5 @@
-export interface Society {
-  society_id: string;
+export interface Center {
+  center_id: string;
   name: string;
   address: string;
   city: string;
@@ -23,7 +23,7 @@ export interface Society {
   };
 }
 
-export interface CreateSocietyData {
+export interface CreateCenterData {
   name: string;
   address: string;
   city: string;
@@ -43,6 +43,6 @@ export interface CreateSocietyData {
   listing_files?: File[];
 }
 
-export interface UpdateSocietyData extends Partial<CreateSocietyData> {
-  society_id: string;
+export interface UpdateCenterData extends Partial<CreateCenterData> {
+  center_id: string;
 }

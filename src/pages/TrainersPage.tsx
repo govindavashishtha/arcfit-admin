@@ -141,7 +141,7 @@ const TrainersPage: React.FC = () => {
             Trainers Management
           </h1>
           <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-            Manage and monitor fitness trainers across all societies
+            Manage and monitor fitness trainers across all centers
           </p>
         </div>
         

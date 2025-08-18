@@ -1,7 +1,7 @@
 import React from 'react';
 import { Search, Filter, X } from 'lucide-react';
 import { TrainerFilters as FilterType } from '../../types/trainer';
-import { useSocietiesQuery } from '../../hooks/queries/useSocietyQueries';
+import { useCentersQuery } from '../../hooks/queries/useCenterQueries';
 
 interface TrainerFiltersProps {
   filters: FilterType;
@@ -14,7 +14,7 @@ const TrainerFilters: React.FC<TrainerFiltersProps> = ({
   onFiltersChange,
   onClearFilters
 }) => {
-  const { data: societies = [] } = useSocietiesQuery();
+  const { data: centers = [] } = useCentersQuery();
 
   const handleFilterChange = (key: keyof FilterType, value: string) => {
     onFiltersChange({
@@ -103,19 +103,20 @@ const TrainerFilters: React.FC<TrainerFiltersProps> = ({
         </div>
 
         {/* Society Filter */}
+        {/* Center Filter */}
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Society
+            Center
           </label>
           <select
-            value={filters.society_id || ''}
-            onChange={(e) => handleFilterChange('society_id', e.target.value)}
+            value={filters.center_id || ''}
+            onChange={(e) => handleFilterChange('center_id', e.target.value)}
             className="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:text-white sm:text-sm"
           >
-            <option value="">All Societies</option>
-            {societies.map((society) => (
-              <option key={society.society_id} value={society.society_id}>
-                {society.name}
+            <option value="">All Centers</option>
+            {centers.map((center) => (
+              <option key={center.center_id} value={center.center_id}>
+                {center.name}
               </option>
             ))}
           </select>

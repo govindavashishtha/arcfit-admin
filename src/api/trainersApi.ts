@@ -15,7 +15,7 @@ export const getAllTrainers = async (params?: TrainerQueryParams): Promise<ApiRe
   if (params?.limit) queryParams.append('limit', params.limit.toString());
   if (params?.specialization) queryParams.append('specialization', params.specialization);
   if (params?.status) queryParams.append('status', params.status);
-  if (params?.society_id) queryParams.append('society_id', params.society_id);
+  if (params?.center_id) queryParams.append('center_id', params.center_id);
   if (params?.search) queryParams.append('search', params.search);
 
   const response = await api.get<ApiResponse<PaginatedTrainersResponse>>(`/api/trainers?${queryParams.toString()}`);

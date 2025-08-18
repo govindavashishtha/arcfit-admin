@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { CreateMembershipData } from '../../types/membership';
 import { useMembersQuery } from '../../hooks/queries/useMemberQueries';
-import { useSocietiesQuery } from '../../hooks/queries/useSocietyQueries';
+import { useCentersQuery } from '../../hooks/queries/useCenterQueries';
 import MemberSearchSelect from './MemberSearchSelect';
 import { 
   User, 
@@ -15,19 +15,19 @@ import {
 } from 'lucide-react';
 
 interface CreateMembershipFormProps {
-  selectedSocietyId: string;
+  selectedCenterId: string;
   onSubmit: (data: CreateMembershipData) => Promise<void>;
   onCancel: () => void;
   isLoading: boolean;
 }
 
 const CreateMembershipForm: React.FC<CreateMembershipFormProps> = ({
-  selectedSocietyId,
+  selectedCenterId,
   onSubmit,
   onCancel,
   isLoading
 }) => {
-  const { data: societies = [] } = useSocietiesQuery();
+  const { data: centers = [] } = useCentersQuery();
   
   const [formData, setFormData] = useState<CreateMembershipData>({
     user_id: '',
@@ -44,10 +44,10 @@ const CreateMembershipForm: React.FC<CreateMembershipFormProps> = ({
 
   // Fetch members for selected society
   const { data: membersData, isLoading: membersLoading } = useMembersQuery(
-    selectedSocietyId ? { society_id: selectedSocietyId } : undefined
+    selectedCenterId ? { center_id: selectedCenterId } : undefined
   );
 
-  const selectedSociety = societies.find(s => s.society_id === selectedSocietyId);
+  const selectedCenter = centers.find(c => c.center_id === selectedCenterId);
 
   const membershipTypes = [
     { value: '1D', label: '1 Day', defaultPrice: 269 },
@@ -135,8 +135,8 @@ const CreateMembershipForm: React.FC<CreateMembershipFormProps> = ({
     setError('');
 
     // Validation
-    if (!selectedSocietyId) {
-      setError('Society is required');
+    if (!selectedCenterId) {
+      setError('Center is required');
       return;
     }
 
@@ -166,7 +166,7 @@ const CreateMembershipForm: React.FC<CreateMembershipFormProps> = ({
               Create New Membership
             </h2>
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              Add a new membership for {selectedSociety?.name}
+              Add a new membership for {selectedCenter?.name}
             </p>
           </div>
           <button
@@ -174,22 +174,23 @@ const CreateMembershipForm: React.FC<CreateMembershipFormProps> = ({
             className="flex items-center text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
           >
             <ArrowLeft className="h-4 w-4 mr-1" />
-            Back to Society Selection
+            Back to Center Selection
           </button>
         </div>
       </div>
 
       <form onSubmit={handleSubmit} className="p-6 space-y-6">
         {/* Society Info */}
+        {/* Center Info */}
         <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
           <div className="flex items-center">
             <Building className="h-5 w-5 text-blue-600 dark:text-blue-400 mr-2" />
             <div>
               <h3 className="text-sm font-medium text-blue-900 dark:text-blue-100">
-                Selected Society
+                Selected Center
               </h3>
               <p className="text-sm text-blue-700 dark:text-blue-300">
-                {selectedSociety?.name} - {selectedSociety?.city}
+                {selectedCenter?.name} - {selectedCenter?.city}
               </p>
             </div>
           </div>

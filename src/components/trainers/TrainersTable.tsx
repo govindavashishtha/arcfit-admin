@@ -149,20 +149,21 @@ const TrainersTable: React.FC<TrainersTableProps> = ({
       ),
     }),
     columnHelper.accessor('societies', {
-      header: 'Societies',
+    columnHelper.accessor('centers', {
+      header: 'Centers',
       cell: ({ getValue }) => {
-        const societies = getValue();
+        const centers = getValue();
         return (
           <div className="space-y-1">
-            {societies.slice(0, 2).map((society, index) => (
+            {centers.slice(0, 2).map((center, index) => (
               <div key={index} className="flex items-center text-xs text-gray-600 dark:text-gray-400">
                 <Building className="h-3 w-3 mr-1 text-gray-400" />
-                <span className="truncate max-w-32">{society.name}</span>
+                <span className="truncate max-w-32">{center.name}</span>
               </div>
             ))}
-            {societies.length > 2 && (
+            {centers.length > 2 && (
               <span className="text-xs text-gray-500 dark:text-gray-400">
-                +{societies.length - 2} more
+                +{centers.length - 2} more
               </span>
             )}
           </div>

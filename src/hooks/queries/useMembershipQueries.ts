@@ -19,7 +19,8 @@ export const membershipKeys = {
   lists: () => [...membershipKeys.all, 'list'] as const,
   list: (params: MembershipQueryParams) => [...membershipKeys.lists(), params] as const,
   societyLists: () => [...membershipKeys.all, 'society-list'] as const,
-  societyList: (societyId: string, params: MembershipQueryParams) => [...membershipKeys.societyLists(), societyId, params] as const,
+  centerLists: () => [...membershipKeys.all, 'center-list'] as const,
+  centerList: (centerId: string, params: MembershipQueryParams) => [...membershipKeys.centerLists(), centerId, params] as const,
   details: () => [...membershipKeys.all, 'detail'] as const,
   detail: (id: string) => [...membershipKeys.details(), id] as const,
 };
@@ -40,17 +41,17 @@ export const useMembershipsQuery = (params?: MembershipQueryParams) => {
 };
 
 // Get Memberships by Society Query with Pagination and Filters
-export const useMembershipsBySocietyQuery = (societyId: string, params?: MembershipQueryParams) => {
+export const useMembershipsByCenterQuery = (centerId: string, params?: MembershipQueryParams) => {
   return useQuery({
-    queryKey: membershipKeys.societyList(societyId, params || {}),
+    queryKey: membershipKeys.centerList(centerId, params || {}),
     queryFn: async () => {
-      const response = await getMembershipsBySociety(societyId, params);
+      const response = await getMembershipsByCenter(centerId, params);
       if (!response.success) {
         throw new Error('Failed to fetch memberships');
       }
       return response.data;
     },
-    enabled: !!societyId, // Only fetch when society is selected
+    enabled: !!centerId, // Only fetch when center is selected
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 };
@@ -86,7 +87,7 @@ export const useCreateMembershipMutation = () => {
     onSuccess: () => {
       // Invalidate and refetch memberships list
       queryClient.invalidateQueries({ queryKey: membershipKeys.lists() });
-      queryClient.invalidateQueries({ queryKey: membershipKeys.societyLists() });
+      queryClient.invalidateQueries({ queryKey: membershipKeys.centerLists() });
     },
     onError: (error) => {
       console.error('Create membership error:', error);
@@ -112,7 +113,7 @@ export const useUpdateMembershipMutation = () => {
       
       // Invalidate and refetch memberships list
       queryClient.invalidateQueries({ queryKey: membershipKeys.lists() });
-      queryClient.invalidateQueries({ queryKey: membershipKeys.societyLists() });
+      queryClient.invalidateQueries({ queryKey: membershipKeys.centerLists() });
     },
     onError: (error) => {
       console.error('Update membership error:', error);
@@ -135,7 +136,7 @@ export const useDeleteMembershipMutation = () => {
       
       // Invalidate and refetch memberships list
       queryClient.invalidateQueries({ queryKey: membershipKeys.lists() });
-      queryClient.invalidateQueries({ queryKey: membershipKeys.societyLists() });
+      queryClient.invalidateQueries({ queryKey: membershipKeys.centerLists() });
     },
     onError: (error) => {
       console.error('Delete membership error:', error);

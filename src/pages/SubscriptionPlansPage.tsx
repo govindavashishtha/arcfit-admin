@@ -16,12 +16,12 @@ import SubscriptionPlanFilters from '../components/subscriptionPlans/Subscriptio
 import SubscriptionPlansTable from '../components/subscriptionPlans/SubscriptionPlansTable';
 import SubscriptionPlanForm from '../components/subscriptionPlans/SubscriptionPlanForm';
 import ConfirmationModal from '../components/ui/ConfirmationModal';
-import { useSociety } from '../contexts/SocietyContext';
+import { useCenter } from '../contexts/CenterContext';
 import toast from 'react-hot-toast';
 import { AlertTriangle } from 'lucide-react';
 
 const SubscriptionPlansPage: React.FC = () => {
-  const { selectedSocietyId, selectedSociety } = useSociety();
+  const { selectedCenterId, selectedCenter } = useCenter();
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize] = useState(10);
   const [filters, setFilters] = useState<SubscriptionPlanFiltersType>({});
@@ -33,7 +33,7 @@ const SubscriptionPlansPage: React.FC = () => {
   const queryParams: SubscriptionPlanQueryParams = {
     page: currentPage,
     limit: pageSize,
-    society_id: selectedSocietyId,
+    center_id: selectedCenterId,
   };
 
   // TanStack Query hooks
@@ -51,7 +51,7 @@ const SubscriptionPlansPage: React.FC = () => {
   // Reset page when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [selectedSocietyId, filters]);
+  }, [selectedCenterId, filters]);
 
   const handleFiltersChange = (newFilters: SubscriptionPlanFiltersType) => {
     setFilters(newFilters);
@@ -169,14 +169,14 @@ const SubscriptionPlansPage: React.FC = () => {
             Subscription Plans
           </h1>
           <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-            Manage subscription plans for your society
+            Manage subscription plans for your center
           </p>
         </div>
         
         <div className="mt-4 lg:mt-0">
           <button
             onClick={handleAddPlan}
-            disabled={!selectedSocietyId}
+            disabled={!selectedCenterId}
             className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:bg-indigo-300 disabled:cursor-not-allowed"
           >
             <Plus className="h-4 w-4 mr-2" />
@@ -186,7 +186,7 @@ const SubscriptionPlansPage: React.FC = () => {
       </div>
 
       {/* Empty State - No Society Selected */}
-      {!selectedSocietyId && (
+      {!selectedCenterId && (
         <>
           {/* Welcome Card */}
           <div className="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg shadow-lg overflow-hidden">
@@ -200,7 +200,7 @@ const SubscriptionPlansPage: React.FC = () => {
                     Subscription Plans Management
                   </h2>
                   <p className="mt-2 text-indigo-100">
-                    View and manage subscription plans with flexible pricing and features for your society members.
+                    View and manage subscription plans with flexible pricing and features for your center members.
                   </p>
                 </div>
               </div>
@@ -275,10 +275,10 @@ const SubscriptionPlansPage: React.FC = () => {
               <div className="text-center">
                 <Tag className="mx-auto h-12 w-12 text-gray-400 mb-4" />
                 <p className="text-gray-500 dark:text-gray-400 mb-4">
-                  Select a society from the sidebar to view its subscription plans
+                  Select a center from the sidebar to view its subscription plans
                 </p>
                 <div className="text-sm text-gray-400 dark:text-gray-500">
-                  Once you select a society, you'll see all available subscription plans
+                  Once you select a center, you'll see all available subscription plans
                 </div>
               </div>
             </div>
@@ -287,7 +287,7 @@ const SubscriptionPlansPage: React.FC = () => {
       )}
 
       {/* Society Selected Content */}
-      {selectedSocietyId && (
+      {selectedCenterId && (
         <>
           {/* Stats Card */}
           {subscriptionPlansData && (
@@ -298,7 +298,7 @@ const SubscriptionPlansPage: React.FC = () => {
                 </div>
                 <div className="ml-4">
                   <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                    Total Subscription Plans for {selectedSociety?.name}
+                    Total Subscription Plans for {selectedCenter?.name}
                   </p>
                   <p className="text-2xl font-semibold text-gray-900 dark:text-white">
                     {subscriptionPlansData.total}
@@ -421,6 +421,7 @@ const SubscriptionPlansPage: React.FC = () => {
         onConfirm={handleConfirmDelete}
         title="Delete Subscription Plan"
         message={`Are you sure you want to delete the subscription plan "${planToDelete?.name}"?\n\nThis action cannot be undone and will remove the plan from your society's offerings.`}
+        message={`Are you sure you want to delete the subscription plan "${planToDelete?.name}"?\n\nThis action cannot be undone and will remove the plan from your center's offerings.`}
         confirmText="Delete Plan"
         cancelText="Keep Plan"
         confirmColor="error"

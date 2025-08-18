@@ -7,7 +7,7 @@ export const getAllMembers = async (params?: MemberQueryParams): Promise<ApiResp
   
   if (params?.page) queryParams.append('page', params.page.toString());
   if (params?.limit) queryParams.append('limit', params.limit.toString());
-  if (params?.society_id) queryParams.append('society_id', params.society_id);
+  if (params?.center_id) queryParams.append('center_id', params.center_id);
   if (params?.status) queryParams.append('status', params.status);
   if (params?.gender) queryParams.append('gender', params.gender);
   if (params?.verification_status) queryParams.append('verification_status', params.verification_status);

@@ -4,10 +4,10 @@ import { useMembersQuery, useDeleteMemberMutation } from '../hooks/queries/useMe
 import { Member, MemberFilters as MemberFiltersType, MemberQueryParams } from '../types/member';
 import MemberFilters from '../components/members/MemberFilters';
 import MembersTable from '../components/members/MembersTable';
-import { useSociety } from '../contexts/SocietyContext';
+import { useCenter } from '../contexts/CenterContext';
 
 const MembersPage: React.FC = () => {
-  const { selectedSocietyId } = useSociety();
+  const { selectedCenterId } = useCenter();
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize] = useState(10);
   const [filters, setFilters] = useState<MemberFiltersType>({});
@@ -16,7 +16,7 @@ const MembersPage: React.FC = () => {
   const queryParams: MemberQueryParams = {
     page: currentPage,
     limit: pageSize,
-    society_id: selectedSocietyId,
+    center_id: selectedCenterId,
     ...filters
   };
 
@@ -33,7 +33,7 @@ const MembersPage: React.FC = () => {
   // Reset page when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [selectedSocietyId, filters]);
+  }, [selectedCenterId, filters]);
 
   const handleFiltersChange = (newFilters: MemberFiltersType) => {
     setFilters(newFilters);
@@ -67,16 +67,16 @@ const MembersPage: React.FC = () => {
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center">
             <Users className="h-8 w-8 mr-3 text-blue-600" />
-            Society Members
+            Center Members
           </h1>
           <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-            Manage and monitor members across different societies
+            Manage and monitor members across different centers
           </p>
         </div>
       </div>
 
       {/* Stats Cards */}
-      {selectedSocietyId && membersData && (
+      {selectedCenterId && membersData && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
             <div className="flex items-center">
@@ -127,7 +127,7 @@ const MembersPage: React.FC = () => {
       )}
 
       {/* Filters */}
-      {selectedSocietyId && (
+      {selectedCenterId && (
         <MemberFilters
           filters={filters}
           onFiltersChange={handleFiltersChange}
@@ -160,18 +160,18 @@ const MembersPage: React.FC = () => {
       )}
 
       {/* Empty State */}
-      {!selectedSocietyId && (
+      {!selectedCenterId && (
         <div className="text-center py-12">
           <Users className="mx-auto h-12 w-12 text-gray-400" />
-          <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-white">No society selected</h3>
+          <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-white">No center selected</h3>
           <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-            Please select a society from the sidebar to view its members.
+            Please select a center from the sidebar to view its members.
           </p>
         </div>
       )}
 
       {/* Members Table */}
-      {selectedSocietyId && (
+      {selectedCenterId && (
         <MembersTable
           data={membersData?.data || []}
           isLoading={isLoading}
@@ -181,7 +181,7 @@ const MembersPage: React.FC = () => {
       )}
 
       {/* Server-side Pagination */}
-      {selectedSocietyId && membersData && membersData.pagination.pages > 1 && (
+      {selectedCenterId && membersData && membersData.pagination.pages > 1 && (
         <div className="bg-white dark:bg-gray-800 px-4 py-3 flex items-center justify-between border-t border-gray-200 dark:border-gray-700 rounded-lg shadow">
           <div className="flex-1 flex justify-between sm:hidden">
             <button

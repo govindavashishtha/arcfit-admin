@@ -1,34 +1,34 @@
 import React from 'react';
 import { Building, ChevronDown } from 'lucide-react';
-import { useSociety } from '../../contexts/SocietyContext';
+import { useCenter } from '../../contexts/CenterContext';
 
-const SocietySelector: React.FC = () => {
+const CenterSelector: React.FC = () => {
   const { 
-    selectedSocietyId, 
-    setSelectedSocietyId, 
-    societies, 
+    selectedCenterId, 
+    setSelectedCenterId, 
+    centers, 
     isLoading 
-  } = useSociety();
+  } = useCenter();
 
   return (
     <div className="px-5 py-4 border-b border-blue-700">
       <label className="block text-sm font-medium text-blue-200 mb-2">
         <Building className="inline h-4 w-4 mr-1" />
-        Select Society
+        Select Center
       </label>
       <div className="relative">
         <select
-          value={selectedSocietyId}
-          onChange={(e) => setSelectedSocietyId(e.target.value)}
+          value={selectedCenterId}
+          onChange={(e) => setSelectedCenterId(e.target.value)}
           disabled={isLoading}
           className="w-full pl-3 pr-10 py-2 border border-blue-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-blue-700 text-white appearance-none"
         >
           <option value="">
-            {isLoading ? 'Loading societies...' : 'Select a society'}
+            {isLoading ? 'Loading centers...' : 'Select a center'}
           </option>
-          {societies.map((society) => (
-            <option key={society.society_id} value={society.society_id}>
-              {society.name} - {society.city}
+          {centers.map((center) => (
+            <option key={center.center_id} value={center.center_id}>
+              {center.name} - {center.city}
             </option>
           ))}
         </select>
@@ -36,13 +36,13 @@ const SocietySelector: React.FC = () => {
           <ChevronDown className="h-5 w-5 text-blue-300" />
         </div>
       </div>
-      {selectedSocietyId && (
+      {selectedCenterId && (
         <div className="mt-2 text-xs text-blue-300">
-          Selected society will be applied across all pages
+          Selected center will be applied across all pages
         </div>
       )}
     </div>
   );
 };
 
-export default SocietySelector;
+export default CenterSelector;

@@ -1,21 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { CreateSocietyData, Society } from '../../types/society';
+import { CreateCenterData, Center } from '../../types/center';
 import { MapPin, Clock, Image as ImageIcon } from 'lucide-react';
 
-interface SocietyFormProps {
-  initialData?: Society;
-  onSubmit: (data: CreateSocietyData) => Promise<void>;
+interface CenterFormProps {
+  initialData?: Center;
+  onSubmit: (data: CreateCenterData) => Promise<void>;
   onCancel: () => void;
   isLoading: boolean;
 }
 
-const SocietyForm: React.FC<SocietyFormProps> = ({
+const CenterForm: React.FC<CenterFormProps> = ({
   initialData,
   onSubmit,
   onCancel,
   isLoading
 }) => {
-  const [formData, setFormData] = useState<CreateSocietyData>({
+  const [formData, setFormData] = useState<CreateCenterData>({
     name: '',
     address: '',
     city: '',
@@ -102,7 +102,7 @@ const SocietyForm: React.FC<SocietyFormProps> = ({
         listing_files: listingFiles,
       });
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred while saving the society');
+      setError(err instanceof Error ? err.message : 'An error occurred while saving the center');
     }
   };
 
@@ -111,7 +111,7 @@ const SocietyForm: React.FC<SocietyFormProps> = ({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-            Society Name
+            Center Name
           </label>
           <input
             type="text"
@@ -464,11 +464,11 @@ const SocietyForm: React.FC<SocietyFormProps> = ({
           disabled={isLoading}
           className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-blue-300 disabled:cursor-not-allowed"
         >
-          {isLoading ? 'Saving...' : 'Save Society'}
+          {isLoading ? 'Saving...' : 'Save Center'}
         </button>
       </div>
     </form>
   );
 };
 
-export default SocietyForm;
+export default CenterForm;

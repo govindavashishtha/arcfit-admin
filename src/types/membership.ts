@@ -44,7 +44,7 @@ const CreateMembershipForm: React.FC<CreateMembershipFormProps> = ({
 
   // Fetch members for selected society
   const { data: membersData, isLoading: membersLoading } = useMembersQuery(
-    selectedSocietyId ? { society_id: selectedSocietyId } : undefined
+    selectedSocietyId ? { center_id: selectedSocietyId } : undefined
   );
 
   const selectedSociety = societies.find(s => s.society_id === selectedSocietyId);

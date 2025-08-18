@@ -1,74 +1,74 @@
 import React, { useState } from 'react';
 import { Building, MapPin, Phone, Search, Plus, Edit2 } from 'lucide-react';
-import { Society } from '../types/society';
+import { Center } from '../types/center';
 import { 
-  useSocietiesQuery, 
-  useCreateSocietyMutation, 
-  useUpdateSocietyMutation 
-} from '../hooks/queries/useSocietyQueries';
-import SocietyForm from '../components/society/SocietyForm';
+  useCentersQuery, 
+  useCreateCenterMutation, 
+  useUpdateCenterMutation 
+} from '../hooks/queries/useCenterQueries';
+import CenterForm from '../components/center/CenterForm';
 import { formatTimeToIST } from '../utils/dateUtils';
 
-const SocietyPage: React.FC = () => {
+const CenterPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [showForm, setShowForm] = useState(false);
-  const [selectedSociety, setSelectedSociety] = useState<Society | null>(null);
+  const [selectedCenter, setSelectedCenter] = useState<Center | null>(null);
 
   // TanStack Query hooks
   const { 
-    data: societies = [], 
+    data: centers = [], 
     isLoading, 
     error,
     refetch 
-  } = useSocietiesQuery();
+  } = useCentersQuery();
   
-  const createSocietyMutation = useCreateSocietyMutation();
-  const updateSocietyMutation = useUpdateSocietyMutation();
+  const createCenterMutation = useCreateCenterMutation();
+  const updateCenterMutation = useUpdateCenterMutation();
 
-  const handleCreateSociety = async (data: any) => {
+  const handleCreateCenter = async (data: any) => {
     try {
-      await createSocietyMutation.mutateAsync(data);
+      await createCenterMutation.mutateAsync(data);
       setShowForm(false);
     } catch (error) {
-      console.error('Failed to create society:', error);
+      console.error('Failed to create center:', error);
     }
   };
 
-  const handleUpdateSociety = async (data: any) => {
-    if (!selectedSociety) return;
+  const handleUpdateCenter = async (data: any) => {
+    if (!selectedCenter) return;
 
     try {
-      await updateSocietyMutation.mutateAsync({
-        society_id: selectedSociety.society_id,
+      await updateCenterMutation.mutateAsync({
+        center_id: selectedCenter.center_id,
         ...data
       });
       setShowForm(false);
-      setSelectedSociety(null);
+      setSelectedCenter(null);
     } catch (error) {
-      console.error('Failed to update society:', error);
+      console.error('Failed to update center:', error);
     }
   };
 
-  const filteredSocieties = societies.filter(society => 
-    society.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    society.address.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    society.city.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredCenters = centers.filter(center => 
+    center.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    center.address.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    center.city.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const isFormLoading = createSocietyMutation.isPending || updateSocietyMutation.isPending;
+  const isFormLoading = createCenterMutation.isPending || updateCenterMutation.isPending;
 
   if (showForm) {
     return (
       <div className="max-w-4xl mx-auto py-6">
         <h2 className="text-2xl font-bold mb-6">
-          {selectedSociety ? 'Edit Society' : 'Add New Society'}
+          {selectedCenter ? 'Edit Center' : 'Add New Center'}
         </h2>
-        <SocietyForm
-          initialData={selectedSociety || undefined}
-          onSubmit={selectedSociety ? handleUpdateSociety : handleCreateSociety}
+        <CenterForm
+          initialData={selectedCenter || undefined}
+          onSubmit={selectedCenter ? handleUpdateCenter : handleCreateCenter}
           onCancel={() => {
             setShowForm(false);
-            setSelectedSociety(null);
+            setSelectedCenter(null);
           }}
           isLoading={isFormLoading}
         />
@@ -80,9 +80,9 @@ const SocietyPage: React.FC = () => {
     <div className="animate-fadeIn">
       <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Society Facilities</h1>
+          <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Center Facilities</h1>
           <p className="text-gray-600 dark:text-gray-300">
-            Manage and monitor your society fitness facilities
+            Manage and monitor your center fitness facilities
           </p>
         </div>
         <div className="mt-4 md:mt-0">
@@ -121,7 +121,7 @@ const SocietyPage: React.FC = () => {
             </div>
             <div className="ml-3">
               <p className="text-sm text-red-700">
-                {error instanceof Error ? error.message : 'Failed to load societies'}
+                {error instanceof Error ? error.message : 'Failed to load centers'}
               </p>
               <button 
                 onClick={() => refetch()}
@@ -139,9 +139,9 @@ const SocietyPage: React.FC = () => {
           <div className="col-span-2 flex justify-center items-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
           </div>
-        ) : filteredSocieties.length > 0 ? (
-          filteredSocieties.map((society) => (
-            <div key={society.society_id} className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden hover:shadow-lg transition-shadow">
+        ) : filteredCenters.length > 0 ? (
+          filteredCenters.map((center) => (
+            <div key={center.center_id} className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden hover:shadow-lg transition-shadow">
               <div className="p-6">
                 <div className="flex justify-between items-start mb-4">
                   <div className="flex items-center">
@@ -149,17 +149,17 @@ const SocietyPage: React.FC = () => {
                       <Building className="h-6 w-6 text-blue-600 dark:text-blue-300" />
                     </div>
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{society.name}</h3>
+                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{center.name}</h3>
                       <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
                         <MapPin className="h-4 w-4 mr-1" />
-                        {society.address}
+                        {center.address}
                       </div>
                     </div>
                   </div>
                   <div className="flex space-x-2">
                     <button
                       onClick={() => {
-                        setSelectedSociety(society);
+                        setSelectedCenter(center);
                         setShowForm(true);
                       }}
                       className="p-2 text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
@@ -173,14 +173,14 @@ const SocietyPage: React.FC = () => {
                   <div className="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
                     <div className="text-sm text-gray-500 dark:text-gray-400">Contact Person</div>
                     <div className="text-sm font-medium text-gray-900 dark:text-white">
-                      {society.meta_data?.contact_person || 'N/A'}
+                      {center.meta_data?.contact_person || 'N/A'}
                     </div>
                   </div>
                   <div className="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
                     <div className="text-sm text-gray-500 dark:text-gray-400">Phone</div>
                     <div className="text-sm font-medium text-gray-900 dark:text-white flex items-center">
                       <Phone className="h-3.5 w-3.5 mr-1" />
-                      {society.meta_data?.phone || 'N/A'}
+                      {center.meta_data?.phone || 'N/A'}
                     </div>
                   </div>
                 </div>
@@ -189,7 +189,7 @@ const SocietyPage: React.FC = () => {
                   <div>
                     <div className="text-sm text-gray-500 dark:text-gray-400">Facilities</div>
                     <div className="flex flex-wrap gap-2 mt-1">
-                      {society?.facilities?.map((facility, index) => (
+                      {center?.facilities?.map((facility, index) => (
                         <span
                           key={index}
                           className="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 rounded-full"
@@ -203,7 +203,7 @@ const SocietyPage: React.FC = () => {
                   <div>
                     <div className="text-sm text-gray-500 dark:text-gray-400">Event Types</div>
                     <div className="flex flex-wrap gap-2 mt-1">
-                      {society?.event_types?.map((event, index) => (
+                      {center?.event_types?.map((event, index) => (
                         <span
                           key={index}
                           className="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 rounded-full"
@@ -221,13 +221,13 @@ const SocietyPage: React.FC = () => {
                   <div>
                     <div className="text-xs text-gray-500 dark:text-gray-400">Morning Hours</div>
                     <div className="text-sm font-medium text-gray-900 dark:text-white">
-                      {formatTimeToIST(society.morning_start_time)} - {formatTimeToIST(society.morning_end_time)}
+                      {formatTimeToIST(center.morning_start_time)} - {formatTimeToIST(center.morning_end_time)}
                     </div>
                   </div>
                   <div>
                     <div className="text-xs text-gray-500 dark:text-gray-400">Evening Hours</div>
                     <div className="text-sm font-medium text-gray-900 dark:text-white">
-                      {formatTimeToIST(society.evening_start_time)} - {formatTimeToIST(society.evening_end_time)}
+                      {formatTimeToIST(center.evening_start_time)} - {formatTimeToIST(center.evening_end_time)}
                     </div>
                   </div>
                 </div>
@@ -247,4 +247,4 @@ const SocietyPage: React.FC = () => {
   );
 };
 
-export default SocietyPage;
+export default CenterPage;

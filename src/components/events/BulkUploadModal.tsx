@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { X, Upload, FileText, AlertCircle } from 'lucide-react';
 import { useUploadBulkEventsMutation } from '../../hooks/queries/useEventQueries';
 import toast from 'react-hot-toast';
-import { useSociety } from '../../contexts/SocietyContext';
+import { useCenter } from '../../contexts/CenterContext';
 
 interface BulkUploadModalProps {
   isOpen: boolean;
@@ -10,7 +10,7 @@ interface BulkUploadModalProps {
 }
 
 const BulkUploadModal: React.FC<BulkUploadModalProps> = ({ isOpen, onClose }) => {
-  const { selectedSocietyId, selectedSociety } = useSociety();
+  const { selectedCenterId, selectedCenter } = useCenter();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isDragOver, setIsDragOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -53,8 +53,8 @@ const BulkUploadModal: React.FC<BulkUploadModalProps> = ({ isOpen, onClose }) =>
   };
 
   const handleUpload = async () => {
-    if (!selectedSocietyId) {
-      toast.error('Please select a society from the sidebar');
+    if (!selectedCenterId) {
+      toast.error('Please select a center from the sidebar');
       return;
     }
 
@@ -65,7 +65,7 @@ const BulkUploadModal: React.FC<BulkUploadModalProps> = ({ isOpen, onClose }) =>
 
     try {
       await uploadBulkEventsMutation.mutateAsync({
-        societyId: selectedSocietyId,
+        centerId: selectedCenterId,
         csvFile: selectedFile
       });
       toast.success('Events uploaded successfully!');
@@ -110,15 +110,15 @@ const BulkUploadModal: React.FC<BulkUploadModalProps> = ({ isOpen, onClose }) =>
 
         {/* Content */}
         <div className="p-6 space-y-6">
-          {/* Society Info */}
+          {/* Center Info */}
           <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
             <div className="flex items-center">
               <div>
                 <h3 className="text-sm font-medium text-blue-900 dark:text-blue-100">
-                  Selected Society
+                  Selected Center
                 </h3>
                 <p className="text-sm text-blue-700 dark:text-blue-300">
-                  {selectedSociety?.name} - {selectedSociety?.city}
+                  {selectedCenter?.name} - {selectedCenter?.city}
                 </p>
               </div>
             </div>
@@ -210,7 +210,7 @@ const BulkUploadModal: React.FC<BulkUploadModalProps> = ({ isOpen, onClose }) =>
           </button>
           <button
             onClick={handleUpload}
-            disabled={!selectedSocietyId || !selectedFile || uploadBulkEventsMutation.isPending}
+            disabled={!selectedCenterId || !selectedFile || uploadBulkEventsMutation.isPending}
             className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-blue-300 disabled:cursor-not-allowed flex items-center"
           >
             {uploadBulkEventsMutation.isPending ? (

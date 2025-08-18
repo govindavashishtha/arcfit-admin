@@ -7,7 +7,7 @@ export const getAllEvents = async (params?: EventQueryParams): Promise<ApiRespon
   
   if (params?.page) queryParams.append('page', params.page.toString());
   if (params?.limit) queryParams.append('limit', params.limit.toString());
-  if (params?.society_id) queryParams.append('society_id', params.society_id);
+  if (params?.center_id) queryParams.append('center_id', params.center_id);
   if (params?.type) queryParams.append('type', params.type);
   if (params?.status) queryParams.append('status', params.status);
   if (params?.from_date) queryParams.append('from_date', params.from_date);
@@ -22,9 +22,9 @@ export const getEventById = async (id: string): Promise<ApiResponse<Event>> => {
   return response.data;
 };
 
-export const uploadBulkEvents = async (societyId: string, csvFile: File): Promise<ApiResponse<any>> => {
+export const uploadBulkEvents = async (centerId: string, csvFile: File): Promise<ApiResponse<any>> => {
   const formData = new FormData();
-  formData.append('society_id', societyId);
+  formData.append('center_id', centerId);
   formData.append('events_csv', csvFile);
 
   const response = await api.post<ApiResponse<any>>('/api/events/bulk/csv', formData, {

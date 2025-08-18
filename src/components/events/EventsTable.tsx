@@ -103,12 +103,12 @@ const EventsTable: React.FC<EventsTableProps> = ({
       },
     }),
     columnHelper.accessor('society.name', {
-      header: 'Society',
+      header: 'Center',
       cell: ({ row }) => (
         <div className="flex items-center space-x-1">
           <MapPin className="h-3 w-3 text-gray-400" />
           <span className="text-sm text-gray-900 dark:text-white">
-            {row.original.society.name}
+            {row.original.center.name}
           </span>
         </div>
       ),

@@ -48,8 +48,8 @@ export const useUploadBulkEventsMutation = () => {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: async ({ societyId, csvFile }: { societyId: string; csvFile: File }) => {
-      const response = await uploadBulkEvents(societyId, csvFile);
+    mutationFn: async ({ centerId, csvFile }: { centerId: string; csvFile: File }) => {
+      const response = await uploadBulkEvents(centerId, csvFile);
       if (!response.success) {
         throw new Error('Failed to upload events');
       }

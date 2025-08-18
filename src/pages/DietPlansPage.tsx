@@ -12,10 +12,10 @@ import DietPlansTable from '../components/dietPlans/DietPlansTable';
 import CreateDietPlanForm from '../components/dietPlans/CreateDietPlanForm';
 import ConfirmationModal from '../components/ui/ConfirmationModal';
 import toast from 'react-hot-toast';
-import { useSociety } from '../contexts/SocietyContext';
+import { useCenter } from '../contexts/CenterContext';
 
 const DietPlansPage: React.FC = () => {
-  const { selectedSocietyId, selectedSociety } = useSociety();
+  const { selectedCenterId, selectedCenter } = useCenter();
   const [selectedUserId, setSelectedUserId] = useState('');
   const [showForm, setShowForm] = useState(false);
   const [dietPlanToDelete, setDietPlanToDelete] = useState<{ id: string; userId: string; userName: string } | null>(null);
@@ -30,7 +30,7 @@ const DietPlansPage: React.FC = () => {
     isLoading: membersLoading, 
     error: membersError 
   } = useMembersQuery(
-    selectedSocietyId ? { society_id: selectedSocietyId } : undefined
+    selectedCenterId ? { center_id: selectedCenterId } : undefined
   );
 
   // Fetch diet plans for selected user
@@ -116,7 +116,7 @@ const DietPlansPage: React.FC = () => {
         <div className="mt-4 lg:mt-0">
           <button
             onClick={() => setShowForm(true)}
-            disabled={!selectedSocietyId}
+          disabled={!selectedCenterId}
             className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 disabled:bg-orange-300 disabled:cursor-not-allowed"
           >
             <Plus className="h-4 w-4 mr-2" />
@@ -126,7 +126,7 @@ const DietPlansPage: React.FC = () => {
       </div>
 
       {/* Empty State - No Society Selected */}
-      {!selectedSocietyId && (
+      {!selectedCenterId && (
         <>
           {/* Welcome Card */}
           <div className="bg-gradient-to-r from-orange-500 to-red-600 rounded-lg shadow-lg overflow-hidden">
@@ -215,10 +215,10 @@ const DietPlansPage: React.FC = () => {
               <div className="text-center">
                 <FileText className="mx-auto h-12 w-12 text-gray-400 mb-4" />
                 <p className="text-gray-500 dark:text-gray-400 mb-4">
-                  Select a society from the sidebar to start managing diet plans for its members
+                  Select a center from the sidebar to start managing diet plans for its members
                 </p>
                 <div className="text-sm text-gray-400 dark:text-gray-500">
-                  Once you select a society, you'll be able to upload and manage diet plans
+                  Once you select a center, you'll be able to upload and manage diet plans
                 </div>
               </div>
             </div>
@@ -227,7 +227,7 @@ const DietPlansPage: React.FC = () => {
       )}
 
       {/* User Selection and Diet Plans */}
-      {selectedSocietyId && (
+      {selectedCenterId && (
         <>
           {/* User Selection */}
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
@@ -235,9 +235,9 @@ const DietPlansPage: React.FC = () => {
               <h3 className="text-lg font-medium text-gray-900 dark:text-white">
                 Select Member to View Diet Plans
               </h3>
-              {selectedSociety && (
+              {selectedCenter && (
                 <div className="text-sm text-gray-500 dark:text-gray-400">
-                  Society: {selectedSociety.name} - {selectedSociety.city}
+                  Center: {selectedCenter.name} - {selectedCenter.city}
                 </div>
               )}
             </div>
@@ -257,7 +257,7 @@ const DietPlansPage: React.FC = () => {
                   </div>
                   <div className="ml-3">
                     <p className="text-sm text-red-700 dark:text-red-200">
-                      Failed to load members for this society
+                      Failed to load members for this center
                     </p>
                   </div>
                 </div>
@@ -272,7 +272,7 @@ const DietPlansPage: React.FC = () => {
                 />
                 {membersData?.data.length === 0 && (
                   <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                    No members found for this society
+                    No members found for this center
                   </p>
                 )}
               </div>
@@ -288,7 +288,7 @@ const DietPlansPage: React.FC = () => {
                 </div>
                 <div className="ml-4">
                   <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                    Total Members in {selectedSociety?.name}
+                    Total Members in {selectedCenter?.name}
                   </p>
                   <p className="text-2xl font-semibold text-gray-900 dark:text-white">
                     {membersData.pagination.total}

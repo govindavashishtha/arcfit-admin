@@ -6,10 +6,10 @@ import CreateMembershipForm from '../components/memberships/CreateMembershipForm
 import MembershipFilters from '../components/memberships/MembershipFilters';
 import MembershipsTable from '../components/memberships/MembershipsTable';
 import toast from 'react-hot-toast';
-import { useSociety } from '../contexts/SocietyContext';
+import { useCenter } from '../contexts/CenterContext';
 
 const MembershipsPage: React.FC = () => {
-  const { selectedSocietyId } = useSociety();
+  const { selectedCenterId } = useCenter();
   const [showForm, setShowForm] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize] = useState(10);
@@ -29,12 +29,12 @@ const MembershipsPage: React.FC = () => {
     isLoading: membershipsLoading, 
     error: membershipsError,
     refetch: refetchMemberships 
-  } = useMembershipsBySocietyQuery(selectedSocietyId, queryParams);
+  } = useMembershipsByCenterQuery(selectedCenterId, queryParams);
 
   // Reset page when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [selectedSocietyId, filters]);
+  }, [selectedCenterId, filters]);
 
   const handleCreateMembership = async (data: CreateMembershipData) => {
     try {
@@ -66,7 +66,7 @@ const MembershipsPage: React.FC = () => {
     return (
       <div className="space-y-6">
         <CreateMembershipForm
-          selectedSocietyId={selectedSocietyId}
+          selectedCenterId={selectedCenterId}
           onSubmit={handleCreateMembership}
           onCancel={handleCancelForm}
           isLoading={isFormLoading}
@@ -85,14 +85,14 @@ const MembershipsPage: React.FC = () => {
             Memberships Management
           </h1>
           <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-            Manage member subscriptions and billing across all societies
+            Manage member subscriptions and billing across all centers
           </p>
         </div>
         
         <div className="mt-4 lg:mt-0">
           <button
             onClick={() => setShowForm(true)}
-            disabled={!selectedSocietyId}
+           disabled={!selectedCenterId}
             className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:bg-purple-300 disabled:cursor-not-allowed"
           >
             <Plus className="h-4 w-4 mr-2" />
@@ -102,7 +102,7 @@ const MembershipsPage: React.FC = () => {
       </div>
 
       {/* Stats Cards */}
-      {selectedSocietyId && membershipsData && (
+      {selectedCenterId && membershipsData && (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
             <div className="flex items-center">
@@ -169,7 +169,7 @@ const MembershipsPage: React.FC = () => {
       )}
 
       {/* Filters */}
-      {selectedSocietyId && (
+      {selectedCenterId && (
         <MembershipFilters
           filters={filters}
           onFiltersChange={handleFiltersChange}
@@ -291,10 +291,10 @@ const MembershipsPage: React.FC = () => {
               <div className="text-center">
                 <CreditCard className="mx-auto h-12 w-12 text-gray-400 mb-4" />
                 <p className="text-gray-500 dark:text-gray-400 mb-4">
-                  Select a society from the sidebar to start viewing and managing memberships
+                  Select a center from the sidebar to start viewing and managing memberships
                 </p>
                 <div className="text-sm text-gray-400 dark:text-gray-500">
-                  Once you select a society, you'll see all memberships for that location
+                  Once you select a center, you'll see all memberships for that location
                 </div>
               </div>
             </div>
@@ -303,7 +303,7 @@ const MembershipsPage: React.FC = () => {
       )}
 
       {/* Memberships Table */}
-      {selectedSocietyId && (
+      {selectedCenterId && (
         <MembershipsTable
           data={membershipsData?.data || []}
           isLoading={membershipsLoading}
@@ -311,7 +311,7 @@ const MembershipsPage: React.FC = () => {
       )}
 
       {/* Server-side Pagination */}
-      {selectedSocietyId && membershipsData && membershipsData.pagination.pages > 1 && (
+      {selectedCenterId && membershipsData && membershipsData.pagination.pages > 1 && (
         <div className="bg-white dark:bg-gray-800 px-4 py-3 flex items-center justify-between border-t border-gray-200 dark:border-gray-700 rounded-lg shadow">
           <div className="flex-1 flex justify-between sm:hidden">
             <button

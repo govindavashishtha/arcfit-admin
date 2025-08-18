@@ -1,6 +1,6 @@
 // Export all query hooks for easy importing
 export * from './useAuthQueries';
-export * from './useSocietyQueries';
+export * from './useCenterQueries';
 export * from './useMemberQueries';
 export * from './useTrainerQueries';
 export * from './useMembershipQueries';
@@ -10,7 +10,7 @@ export * from './useSubscriptionPlanQueries';
 
 // Export query keys for external use
 export { authKeys } from './useAuthQueries';
-export { societyKeys } from './useSocietyQueries';
+export { centerKeys } from './useCenterQueries';
 export { memberKeys } from './useMemberQueries';
 export { trainerKeys } from './useTrainerQueries';
 export { membershipKeys } from './useMembershipQueries';

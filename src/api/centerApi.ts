@@ -1,18 +1,18 @@
 import api from './authApi';
-import { Society, CreateSocietyData, UpdateSocietyData } from '../types/society';
+import { Center, CreateCenterData, UpdateCenterData } from '../types/center';
 import { ApiResponse } from '../types/auth';
 
-export const getAllSocieties = async (): Promise<ApiResponse<Society[]>> => {
-  const response = await api.get<ApiResponse<Society[]>>('/api/societies');
+export const getAllCenters = async (): Promise<ApiResponse<Center[]>> => {
+  const response = await api.get<ApiResponse<Center[]>>('/api/centers');
   return response.data;
 };
 
-export const getSocietyById = async (id: string): Promise<ApiResponse<Society>> => {
-  const response = await api.get<ApiResponse<Society>>(`/api/societies/${id}`);
+export const getCenterById = async (id: string): Promise<ApiResponse<Center>> => {
+  const response = await api.get<ApiResponse<Center>>(`/api/centers/${id}`);
   return response.data;
 };
 
-export const createSociety = async (data: CreateSocietyData): Promise<ApiResponse<Society>> => {
+export const createCenter = async (data: CreateCenterData): Promise<ApiResponse<Center>> => {
   const formData = new FormData();
   
   // Add all text fields
@@ -35,7 +35,7 @@ export const createSociety = async (data: CreateSocietyData): Promise<ApiRespons
     });
   }
 
-  const response = await api.post<ApiResponse<Society>>('/api/societies', formData, {
+  const response = await api.post<ApiResponse<Center>>('/api/centers', formData, {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
@@ -43,8 +43,8 @@ export const createSociety = async (data: CreateSocietyData): Promise<ApiRespons
   return response.data;
 };
 
-export const updateSociety = async (data: UpdateSocietyData): Promise<ApiResponse<Society>> => {
-  const { society_id, ...updateData } = data;
+export const updateCenter = async (data: UpdateCenterData): Promise<ApiResponse<Center>> => {
+  const { center_id, ...updateData } = data;
   const formData = new FormData();
   
   // Add all text fields
@@ -67,7 +67,7 @@ export const updateSociety = async (data: UpdateSocietyData): Promise<ApiRespons
     });
   }
 
-  const response = await api.put<ApiResponse<Society>>(`/api/societies/${society_id}`, formData, {
+  const response = await api.put<ApiResponse<Center>>(`/api/centers/${center_id}`, formData, {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
@@ -75,6 +75,6 @@ export const updateSociety = async (data: UpdateSocietyData): Promise<ApiRespons
   return response.data;
 };
 
-export const deleteSociety = async (id: string): Promise<void> => {
-  await api.delete(`/api/societies/${id}`);
+export const deleteCenter = async (id: string): Promise<void> => {
+  await api.delete(`/api/centers/${id}`);
 };
