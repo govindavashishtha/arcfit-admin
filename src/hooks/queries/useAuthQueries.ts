@@ -22,11 +22,20 @@ export const useLoginMutation = () => {
   
   return useMutation({
     mutationFn: async (credentials: LoginCredentials) => {
-      const response = await login(credentials);
-      if (!response.success || !response.data) {
-        throw new Error('Login failed. Please check your credentials.');
+      try {
+        const response = await login(credentials);
+        if (!response.success || !response.data) {
+          throw new Error('Login failed. Please check your credentials.');
+        }
+        return response.data;
+      } catch (error: any) {
+        // Check if it's an Axios error with 403 status
+        if (error?.response?.status === 403) {
+          throw new Error('Login failed. Please check your email and password, or contact support if the issue persists.');
+        }
+        // For other errors, throw the original error message or a generic one
+        throw new Error(error?.message || 'Login failed. Please try again.');
       }
-      return response.data;
     },
     onSuccess: (data) => {
       const { access_token, refresh_token, expires_in, ...userData } = data;
