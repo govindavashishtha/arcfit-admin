@@ -148,7 +148,6 @@ const TrainersTable: React.FC<TrainersTableProps> = ({
         </div>
       ),
     }),
-    columnHelper.accessor('societies', {
     columnHelper.accessor('centers', {
       header: 'Centers',
       cell: ({ getValue }) => {
