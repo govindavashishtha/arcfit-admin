@@ -1,6 +1,7 @@
 import React from 'react';
 import { Search, Filter, X, Calendar } from 'lucide-react';
 import { MembershipFilters as FilterType } from '../../types/membership';
+import useAuth from '../../hooks/useAuth';
 
 interface MembershipFiltersProps {
   filters: FilterType;
@@ -13,6 +14,9 @@ const MembershipFilters: React.FC<MembershipFiltersProps> = ({
   onFiltersChange,
   onClearFilters
 }) => {
+  const { user } = useAuth();
+  const isSocietyAdmin = user?.role === 'society_admin';
+  
   const handleFilterChange = (key: keyof FilterType, value: string) => {
     onFiltersChange({
       ...filters,
@@ -34,8 +38,8 @@ const MembershipFilters: React.FC<MembershipFiltersProps> = ({
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-medium text-gray-900 dark:text-white flex items-center">
-          <Filter className="h-5 w-5 mr-2" />
+        <h3 className={`text-lg font-medium ${isSocietyAdmin ? 'text-emerald-800' : 'text-gray-900'} dark:text-white flex items-center`}>
+          <Filter className={`h-5 w-5 mr-2 ${isSocietyAdmin ? 'text-emerald-600' : ''}`} />
           Filters & Search
         </h3>
         {hasActiveFilters && (
@@ -64,7 +68,11 @@ const MembershipFilters: React.FC<MembershipFiltersProps> = ({
               placeholder="Search by member name, email, or transaction ID..."
               value={filters.search || ''}
               onChange={(e) => handleFilterChange('search', e.target.value)}
-              className="pl-10 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-purple-500 focus:ring-purple-500 dark:bg-gray-700 dark:text-white sm:text-sm"
+              className={`pl-10 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm ${
+                isSocietyAdmin 
+                  ? 'focus:border-emerald-500 focus:ring-emerald-500' 
+                  : 'focus:border-purple-500 focus:ring-purple-500'
+              } dark:bg-gray-700 dark:text-white sm:text-sm`}
             />
           </div>
         </div>
@@ -77,7 +85,11 @@ const MembershipFilters: React.FC<MembershipFiltersProps> = ({
           <select
             value={filters.status || ''}
             onChange={(e) => handleFilterChange('status', e.target.value)}
-            className="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-purple-500 focus:ring-purple-500 dark:bg-gray-700 dark:text-white sm:text-sm"
+            className={`block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm ${
+              isSocietyAdmin 
+                ? 'focus:border-emerald-500 focus:ring-emerald-500' 
+                : 'focus:border-purple-500 focus:ring-purple-500'
+            } dark:bg-gray-700 dark:text-white sm:text-sm`}
           >
             <option value="">All Status</option>
             <option value="active">Active</option>
@@ -95,7 +107,11 @@ const MembershipFilters: React.FC<MembershipFiltersProps> = ({
           <select
             value={filters.type || ''}
             onChange={(e) => handleFilterChange('type', e.target.value)}
-            className="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-purple-500 focus:ring-purple-500 dark:bg-gray-700 dark:text-white sm:text-sm"
+            className={`block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm ${
+              isSocietyAdmin 
+                ? 'focus:border-emerald-500 focus:ring-emerald-500' 
+                : 'focus:border-purple-500 focus:ring-purple-500'
+            } dark:bg-gray-700 dark:text-white sm:text-sm`}
           >
             <option value="">All Types</option>
             {membershipTypes.map((type) => (
@@ -119,7 +135,11 @@ const MembershipFilters: React.FC<MembershipFiltersProps> = ({
               type="date"
               value={filters.start_date || ''}
               onChange={(e) => handleFilterChange('start_date', e.target.value)}
-              className="pl-10 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-purple-500 focus:ring-purple-500 dark:bg-gray-700 dark:text-white sm:text-sm"
+              className={`pl-10 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm ${
+                isSocietyAdmin 
+                  ? 'focus:border-emerald-500 focus:ring-emerald-500' 
+                  : 'focus:border-purple-500 focus:ring-purple-500'
+              } dark:bg-gray-700 dark:text-white sm:text-sm`}
             />
           </div>
         </div>
@@ -137,7 +157,11 @@ const MembershipFilters: React.FC<MembershipFiltersProps> = ({
               type="date"
               value={filters.end_date || ''}
               onChange={(e) => handleFilterChange('end_date', e.target.value)}
-              className="pl-10 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-purple-500 focus:ring-purple-500 dark:bg-gray-700 dark:text-white sm:text-sm"
+              className={`pl-10 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm ${
+                isSocietyAdmin 
+                  ? 'focus:border-emerald-500 focus:ring-emerald-500' 
+                  : 'focus:border-purple-500 focus:ring-purple-500'
+              } dark:bg-gray-700 dark:text-white sm:text-sm`}
             />
           </div>
         </div>

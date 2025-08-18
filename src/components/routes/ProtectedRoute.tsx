@@ -3,7 +3,7 @@ import { Navigate, Outlet } from 'react-router-dom';
 import useAuth from '../../hooks/useAuth';
 
 const ProtectedRoute: React.FC = () => {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, user } = useAuth();
 
   // Show loading state while checking authentication
   if (isLoading) {
@@ -20,6 +20,11 @@ const ProtectedRoute: React.FC = () => {
   // Redirect to login if not authenticated
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
+  }
+  
+  // Redirect society admins to members page by default
+  if (user?.role === 'society_admin' && window.location.pathname === '/dashboard') {
+    return <Navigate to="/members" replace />;
   }
 
   // Render the child routes

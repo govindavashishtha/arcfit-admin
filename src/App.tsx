@@ -45,7 +45,7 @@ function App() {
               </Route>
 
               {/* Redirect to dashboard by default if logged in */}
-              <Route path="/" element={<Navigate to="/dashboard" replace />} />
+              <Route path="/" element={<Navigate to="/members" replace />} />
               
               {/* 404 page */}
               <Route path="*" element={<NotFoundPage />} />

@@ -22,6 +22,7 @@ export interface User {
   created_at: string;
   is_super_admin?: boolean;
   id?: number;
+  society_id?: string;
 }
 
 export interface ApiResponse<T> {
@@ -45,6 +46,7 @@ export interface LoginResponse {
   role: string;
   created_at: string;
   updated_at: string;
+  society_id?: string;
 }
 
 export interface RefreshTokenResponse {

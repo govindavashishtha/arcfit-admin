@@ -1,14 +1,35 @@
 import React from 'react';
 import { Building, ChevronDown } from 'lucide-react';
 import { useCenter } from '../../contexts/CenterContext';
+import useAuth from '../../hooks/useAuth';
 
 const CenterSelector: React.FC = () => {
+  const { user } = useAuth();
   const { 
     selectedCenterId, 
     setSelectedCenterId, 
     centers, 
-    isLoading 
+    isLoading,
+    isSocietyAdmin
   } = useCenter();
+  
+  // Don't render for society admins
+  if (isSocietyAdmin) {
+    const selectedCenter = centers.find(c => c.center_id === selectedCenterId);
+    return (
+      <div className="px-5 py-4 border-b border-emerald-700">
+        <div className="flex items-center">
+          <Building className="h-4 w-4 mr-2 text-emerald-200" />
+          <div>
+            <div className="text-sm font-medium text-emerald-200">Your Center</div>
+            <div className="text-xs text-emerald-300">
+              {selectedCenter?.name || 'Loading...'}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="px-5 py-4 border-b border-blue-700">

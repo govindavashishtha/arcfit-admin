@@ -11,66 +11,92 @@ interface SidebarProps {
 const Sidebar: React.FC<SidebarProps> = ({ isMobile }) => {
   const { user } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
+  
+  const isSocietyAdmin = user?.role === 'society_admin';
 
   const toggleSidebar = () => {
     setIsOpen(!isOpen);
   };
 
-  const navItems = [
+  const allNavItems = [
     {
       name: 'Dashboard',
       path: '/dashboard',
       icon: <LayoutDashboard className="w-5 h-5" />,
+      roles: ['admin', 'super_admin'], // Only for admins
     },
     {
       name: 'Members',
       path: '/members',
       icon: <Users className="w-5 h-5" />,
+      roles: ['admin', 'super_admin', 'society_admin'], // Available for society admins
     },
     {
       name: 'Trainers',
       path: '/trainers',
       icon: <UserCheck className="w-5 h-5" />,
+      roles: ['admin', 'super_admin'], // Only for admins
     },
     {
       name: 'Memberships',
       path: '/memberships',
       icon: <CreditCard className="w-5 h-5" />,
+      roles: ['admin', 'super_admin', 'society_admin'], // Available for society admins
     },
     {
       name: 'Events',
       path: '/events',
       icon: <Calendar className="w-5 h-5" />,
+      roles: ['admin', 'super_admin'], // Only for admins
     },
     {
       name: 'Diet Plans',
       path: '/diet-plans',
       icon: <FileText className="w-5 h-5" />,
+      roles: ['admin', 'super_admin'], // Only for admins
     },
     {
       name: 'Subscription Plans',
       path: '/subscription-plans',
       icon: <Tag className="w-5 h-5" />,
+      roles: ['admin', 'super_admin'], // Only for admins
     },
     {
       name: 'Center',
       path: '/center',
       icon: <Building className="w-5 h-5" />,
+      roles: ['admin', 'super_admin'], // Only for admins
     },
   ];
+  
+  // Filter nav items based on user role
+  const navItems = allNavItems.filter(item => 
+    item.roles.includes(user?.role || 'admin')
+  );
+
+  // Different colors for society admin
+  const sidebarBgColor = isSocietyAdmin ? 'bg-emerald-800' : 'bg-blue-800';
+  const borderColor = isSocietyAdmin ? 'border-emerald-700' : 'border-blue-700';
+  const buttonBgColor = isSocietyAdmin ? 'bg-emerald-600' : 'bg-blue-600';
+  const textColor = isSocietyAdmin ? 'text-emerald-200' : 'text-blue-200';
+  const hoverBgColor = isSocietyAdmin ? 'hover:bg-emerald-700' : 'hover:bg-blue-700';
+  const activeBgColor = isSocietyAdmin ? 'bg-emerald-700' : 'bg-blue-700';
+  const selectBgColor = isSocietyAdmin ? 'bg-emerald-700' : 'bg-blue-700';
+  const selectBorderColor = isSocietyAdmin ? 'border-emerald-600' : 'border-blue-600';
+  const selectTextColor = isSocietyAdmin ? 'text-emerald-300' : 'text-blue-300';
 
   const sidebarClasses = isMobile
-    ? `fixed inset-y-0 left-0 z-30 w-64 bg-blue-800 text-white transform ${
+    ? `fixed inset-y-0 left-0 z-30 w-64 ${sidebarBgColor} text-white transform ${
         isOpen ? 'translate-x-0' : '-translate-x-full'
       } transition-transform duration-300 ease-in-out`
-    : 'w-64 bg-blue-800 text-white min-h-screen';
+    : `w-64 ${sidebarBgColor} text-white min-h-screen`;
 
   return (
     <>
       {isMobile && (
         <button
           onClick={toggleSidebar}
-          className="fixed top-4 left-4 z-40 p-2 rounded-md bg-blue-600 text-white focus:outline-none"
+          className={`fixed top-4 left-4 z-40 p-2 rounded-md ${buttonBgColor} text-white focus:outline-none`}
           aria-label="Toggle sidebar"
         >
           {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -78,32 +104,36 @@ const Sidebar: React.FC<SidebarProps> = ({ isMobile }) => {
       )}
 
       <div className={sidebarClasses}>
-        <div className="p-5 border-b border-blue-700">
+        <div className={`p-5 border-b ${borderColor}`}>
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center">
+            <div className={`w-10 h-10 rounded-full ${buttonBgColor} flex items-center justify-center`}>
               <span className="font-bold text-lg">AF</span>
             </div>
             <div>
               <h2 className="font-bold text-xl">ArcFit</h2>
-              <p className="text-xs text-blue-200">Admin Dashboard</p>
+              <p className={`text-xs ${textColor}`}>
+                {isSocietyAdmin ? 'Society Dashboard' : 'Admin Dashboard'}
+              </p>
             </div>
           </div>
         </div>
 
-        <div className="p-5 border-b border-blue-700">
+        <div className={`p-5 border-b ${borderColor}`}>
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center">
+            <div className={`w-10 h-10 rounded-full ${buttonBgColor} flex items-center justify-center`}>
               <span className="font-bold text-lg">{user?.first_name?.charAt(0) || 'A'}</span>
             </div>
             <div>
               <h3 className="font-semibold text-sm">{user?.first_name} {user?.last_name}</h3>
-              <p className="text-xs text-blue-200">{user?.role || 'Admin'}</p>
+              <p className={`text-xs ${textColor}`}>
+                {user?.role === 'society_admin' ? 'Society Admin' : user?.role || 'Admin'}
+              </p>
             </div>
           </div>
         </div>
 
         {/* Society Selector */}
-        <SocietySelector />
+        {!isSocietyAdmin && <SocietySelector />}
 
         <nav className="p-5">
           <ul className="space-y-2">
@@ -114,8 +144,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isMobile }) => {
                   className={({ isActive }) =>
                     `flex items-center space-x-3 p-2 rounded-md transition-colors ${
                       isActive
-                        ? 'bg-blue-700 text-white'
-                        : 'text-blue-100 hover:bg-blue-700 hover:text-white'
+                        ? `${activeBgColor} text-white`
+                        : `text-${isSocietyAdmin ? 'emerald' : 'blue'}-100 ${hoverBgColor} hover:text-white`
                     }`
                   }
                   onClick={() => isMobile && setIsOpen(false)}
