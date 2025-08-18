@@ -99,8 +99,6 @@ const TrainerForm: React.FC<TrainerFormProps> = ({
         : [...prev.specialisations, specialization]
     }));
   };
-
-  const handleSocietyToggle = (societyId: string) => {
   const handleCenterToggle = (centerId: string) => {
     setFormData(prev => ({
       ...prev,
@@ -141,8 +139,6 @@ const TrainerForm: React.FC<TrainerFormProps> = ({
       setError('Please select at least one specialization');
       return;
     }
-
-    if (formData.society_ids.length === 0) {
     if (formData.center_ids.length === 0) {
       setError('Please select at least one center');
       return;
@@ -521,7 +517,6 @@ const TrainerForm: React.FC<TrainerFormProps> = ({
           </div>
         </div>
 
-        {/* Society Assignment */}
         {/* Center Assignment */}
         <div className="space-y-4">
           <h3 className="text-lg font-medium text-gray-900 dark:text-white flex items-center">
