@@ -10,18 +10,18 @@ const CenterSelector: React.FC = () => {
     setSelectedCenterId, 
     centers, 
     isLoading,
-    isSocietyAdmin
+    isCenterAdmin
   } = useCenter();
   
-  // For society admins, show center name only
-  if (isSocietyAdmin) {
+  // For center admins, show center name only
+  if (isCenterAdmin) {
     const selectedCenter = centers.find(c => c.center_id === selectedCenterId);
     return (
       <div className="px-5 py-4 border-b border-emerald-700">
         <div className="flex items-center">
           <Building className="h-4 w-4 mr-2 text-emerald-200" />
           <div>
-            <div className="text-sm font-medium text-emerald-200">Your Society</div>
+            <div className="text-sm font-medium text-emerald-200">Your Center</div>
             <div className="text-xs text-emerald-300">
               {selectedCenter?.name || 'Loading...'}
             </div>

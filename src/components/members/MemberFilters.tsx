@@ -15,7 +15,7 @@ const MemberFilters: React.FC<MemberFiltersProps> = ({
   onClearFilters
 }) => {
   const { user } = useAuth();
-  const isSocietyAdmin = user?.role === 'society_admin';
+  const isCenterAdmin = user?.role === 'center_admin';
   
   const handleFilterChange = (key: keyof FilterType, value: string) => {
     onFiltersChange({
@@ -30,7 +30,7 @@ const MemberFilters: React.FC<MemberFiltersProps> = ({
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-medium text-gray-900 dark:text-white flex items-center">
-          <Filter className={`h-5 w-5 mr-2 ${isSocietyAdmin ? 'text-emerald-600' : ''}`} />
+          <Filter className={`h-5 w-5 mr-2 ${isCenterAdmin ? 'text-emerald-600' : ''}`} />
           Filters & Search
         </h3>
         {hasActiveFilters && (
@@ -60,7 +60,7 @@ const MemberFilters: React.FC<MemberFiltersProps> = ({
               value={filters.search || ''}
               onChange={(e) => handleFilterChange('search', e.target.value)}
               className={`pl-10 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm ${
-                isSocietyAdmin 
+                isCenterAdmin 
                   ? 'focus:border-emerald-500 focus:ring-emerald-500' 
                   : 'focus:border-blue-500 focus:ring-blue-500'
               } dark:bg-gray-700 dark:text-white sm:text-sm`}
@@ -77,7 +77,7 @@ const MemberFilters: React.FC<MemberFiltersProps> = ({
             value={filters.status || ''}
             onChange={(e) => handleFilterChange('status', e.target.value)}
             className={`block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm ${
-              isSocietyAdmin 
+              isCenterAdmin 
                 ? 'focus:border-emerald-500 focus:ring-emerald-500' 
                 : 'focus:border-blue-500 focus:ring-blue-500'
             } dark:bg-gray-700 dark:text-white sm:text-sm`}
@@ -98,7 +98,7 @@ const MemberFilters: React.FC<MemberFiltersProps> = ({
             value={filters.gender || ''}
             onChange={(e) => handleFilterChange('gender', e.target.value)}
             className={`block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm ${
-              isSocietyAdmin 
+              isCenterAdmin 
                 ? 'focus:border-emerald-500 focus:ring-emerald-500' 
                 : 'focus:border-blue-500 focus:ring-blue-500'
             } dark:bg-gray-700 dark:text-white sm:text-sm`}
@@ -119,7 +119,7 @@ const MemberFilters: React.FC<MemberFiltersProps> = ({
             value={filters.verification_status || ''}
             onChange={(e) => handleFilterChange('verification_status', e.target.value)}
             className={`block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm ${
-              isSocietyAdmin 
+              isCenterAdmin 
                 ? 'focus:border-emerald-500 focus:ring-emerald-500' 
                 : 'focus:border-blue-500 focus:ring-blue-500'
             } dark:bg-gray-700 dark:text-white sm:text-sm`}

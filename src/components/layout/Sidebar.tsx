@@ -12,7 +12,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isMobile }) => {
   const { user, logout } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   
-  const isSocietyAdmin = user?.role === 'society_admin';
+  const isCenterAdmin = user?.role === 'center_admin';
 
   const handleLogout = async () => {
     try {
@@ -36,7 +36,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isMobile }) => {
       name: 'Members',
       path: '/members',
       icon: <Users className="w-5 h-5" />,
-      roles: ['admin', 'super_admin', 'society_admin'], // Available for society admins
+      roles: ['admin', 'super_admin', 'center_admin'], // Available for center admins
     },
     {
       name: 'Trainers',
@@ -48,7 +48,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isMobile }) => {
       name: 'Memberships',
       path: '/memberships',
       icon: <CreditCard className="w-5 h-5" />,
-      roles: ['admin', 'super_admin', 'society_admin'], // Available for society admins
+      roles: ['admin', 'super_admin', 'center_admin'], // Available for center admins
     },
     {
       name: 'Events',
@@ -82,15 +82,16 @@ const Sidebar: React.FC<SidebarProps> = ({ isMobile }) => {
   );
 
   // Different colors for society admin
-  const sidebarBgColor = isSocietyAdmin ? 'bg-emerald-800' : 'bg-blue-800';
-  const borderColor = isSocietyAdmin ? 'border-emerald-700' : 'border-blue-700';
-  const buttonBgColor = isSocietyAdmin ? 'bg-emerald-600' : 'bg-blue-600';
-  const textColor = isSocietyAdmin ? 'text-emerald-200' : 'text-blue-200';
-  const hoverBgColor = isSocietyAdmin ? 'hover:bg-emerald-700' : 'hover:bg-blue-700';
-  const activeBgColor = isSocietyAdmin ? 'bg-emerald-700' : 'bg-blue-700';
-  const selectBgColor = isSocietyAdmin ? 'bg-emerald-700' : 'bg-blue-700';
-  const selectBorderColor = isSocietyAdmin ? 'border-emerald-600' : 'border-blue-600';
-  const selectTextColor = isSocietyAdmin ? 'text-emerald-300' : 'text-blue-300';
+  // Different colors for center admin
+  const sidebarBgColor = isCenterAdmin ? 'bg-emerald-800' : 'bg-blue-800';
+  const borderColor = isCenterAdmin ? 'border-emerald-700' : 'border-blue-700';
+  const buttonBgColor = isCenterAdmin ? 'bg-emerald-600' : 'bg-blue-600';
+  const textColor = isCenterAdmin ? 'text-emerald-200' : 'text-blue-200';
+  const hoverBgColor = isCenterAdmin ? 'hover:bg-emerald-700' : 'hover:bg-blue-700';
+  const activeBgColor = isCenterAdmin ? 'bg-emerald-700' : 'bg-blue-700';
+  const selectBgColor = isCenterAdmin ? 'bg-emerald-700' : 'bg-blue-700';
+  const selectBorderColor = isCenterAdmin ? 'border-emerald-600' : 'border-blue-600';
+  const selectTextColor = isCenterAdmin ? 'text-emerald-300' : 'text-blue-300';
 
   const sidebarClasses = isMobile
     ? `fixed inset-y-0 left-0 z-30 w-64 ${sidebarBgColor} text-white transform ${
@@ -119,7 +120,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isMobile }) => {
             <div>
               <h2 className="font-bold text-xl">ArcFit</h2>
               <p className={`text-xs ${textColor}`}>
-                {isSocietyAdmin ? 'Society Dashboard' : 'Admin Dashboard'}
+                {isCenterAdmin ? 'Center Dashboard' : 'Admin Dashboard'}
               </p>
             </div>
           </div>
@@ -133,14 +134,14 @@ const Sidebar: React.FC<SidebarProps> = ({ isMobile }) => {
             <div>
               <h3 className="font-semibold text-sm">{user?.first_name} {user?.last_name}</h3>
               <p className={`text-xs ${textColor}`}>
-                {user?.role === 'society_admin' ? 'Society Admin' : user?.role || 'Admin'}
+                {user?.role === 'center_admin' ? 'Center Admin' : user?.role || 'Admin'}
               </p>
             </div>
           </div>
         </div>
 
         {/* Society Selector */}
-        {!isSocietyAdmin && <SocietySelector />}
+        {!isCenterAdmin && <SocietySelector />}
 
         <nav className="p-5">
           <ul className="space-y-2">
@@ -152,7 +153,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isMobile }) => {
                     `flex items-center space-x-3 p-2 rounded-md transition-colors ${
                       isActive
                         ? `${activeBgColor} text-white`
-                        : `text-${isSocietyAdmin ? 'emerald' : 'blue'}-100 ${hoverBgColor} hover:text-white`
+                        : `text-${isCenterAdmin ? 'emerald' : 'blue'}-100 ${hoverBgColor} hover:text-white`
                     }`
                   }
                   onClick={() => isMobile && setIsOpen(false)}

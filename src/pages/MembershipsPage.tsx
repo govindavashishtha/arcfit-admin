@@ -17,7 +17,7 @@ const MembershipsPage: React.FC = () => {
   const [pageSize] = useState(10);
   const [filters, setFilters] = useState<MembershipFiltersType>({});
   
-  const isSocietyAdmin = user?.role === 'society_admin';
+  const isCenterAdmin = user?.role === 'center_admin';
 
   // Build query parameters
   const queryParams: MembershipQueryParams = {
@@ -66,7 +66,7 @@ const MembershipsPage: React.FC = () => {
 
   const isFormLoading = createMembershipMutation.isPending;
 
-  if (showForm && !isSocietyAdmin) {
+  if (showForm && !isCenterAdmin) {
     return (
       <div className="space-y-6">
         <CreateMembershipForm
@@ -84,19 +84,19 @@ const MembershipsPage: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <h1 className={`text-2xl font-bold ${isSocietyAdmin ? 'text-emerald-800' : 'text-gray-900'} dark:text-white flex items-center`}>
-            <CreditCard className={`h-8 w-8 mr-3 ${isSocietyAdmin ? 'text-emerald-600' : 'text-purple-600'}`} />
-            {isSocietyAdmin ? 'Society Memberships' : 'Memberships Management'}
+          <h1 className={`text-2xl font-bold ${isCenterAdmin ? 'text-emerald-800' : 'text-gray-900'} dark:text-white flex items-center`}>
+            <CreditCard className={`h-8 w-8 mr-3 ${isCenterAdmin ? 'text-emerald-600' : 'text-purple-600'}`} />
+            {isCenterAdmin ? 'Center Memberships' : 'Memberships Management'}
           </h1>
           <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-            {isSocietyAdmin 
-              ? 'View member subscriptions and billing for your society'
+            {isCenterAdmin 
+              ? 'View member subscriptions and billing for your center'
               : 'Manage member subscriptions and billing across all centers'
             }
           </p>
         </div>
         
-        {!isSocietyAdmin && (
+        {!isCenterAdmin && (
           <div className="mt-4 lg:mt-0">
           <button
             onClick={() => setShowForm(true)}
@@ -116,7 +116,7 @@ const MembershipsPage: React.FC = () => {
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
             <div className="flex items-center">
               <div className="flex-shrink-0">
-                <CreditCard className={`h-8 w-8 ${isSocietyAdmin ? 'text-emerald-600' : 'text-purple-600'}`} />
+                <CreditCard className={`h-8 w-8 ${isCenterAdmin ? 'text-emerald-600' : 'text-purple-600'}`} />
               </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Total Memberships</p>

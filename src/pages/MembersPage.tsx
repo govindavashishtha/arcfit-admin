@@ -15,6 +15,7 @@ const MembersPage: React.FC = () => {
   const [filters, setFilters] = useState<MemberFiltersType>({});
   
   const isSocietyAdmin = user?.role === 'society_admin';
+  const isCenterAdmin = user?.role === 'center_admin';
 
   // Build query parameters
   const queryParams: MemberQueryParams = {
@@ -69,13 +70,13 @@ const MembersPage: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center">
-            <Users className={`h-8 w-8 mr-3 ${isSocietyAdmin ? 'text-emerald-600' : 'text-blue-600'}`} />
-            {isSocietyAdmin ? 'Society Members' : 'Center Members'}
+          <h1 className={`text-2xl font-bold ${isCenterAdmin ? 'text-emerald-800' : 'text-gray-900'} dark:text-white flex items-center`}>
+            <Users className={`h-8 w-8 mr-3 ${isCenterAdmin ? 'text-emerald-600' : 'text-blue-600'}`} />
+            {isCenterAdmin ? 'Center Members' : 'Center Members'}
           </h1>
           <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-            {isSocietyAdmin 
-              ? 'View members in your society' 
+            {isCenterAdmin 
+              ? 'View members in your center' 
               : 'Manage and monitor members across different centers'
             }
           </p>
@@ -88,7 +89,7 @@ const MembersPage: React.FC = () => {
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
             <div className="flex items-center">
               <div className="flex-shrink-0">
-                <Users className={`h-8 w-8 ${isSocietyAdmin ? 'text-emerald-600' : 'text-blue-600'}`} />
+                <Users className={`h-8 w-8 ${isCenterAdmin ? 'text-emerald-600' : 'text-blue-600'}`} />
               </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Total Members</p>
@@ -171,11 +172,11 @@ const MembersPage: React.FC = () => {
         <div className="text-center py-12">
           <Users className="mx-auto h-12 w-12 text-gray-400" />
           <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-white">
-            {isSocietyAdmin ? 'Loading your society...' : 'No center selected'}
+            {isCenterAdmin ? 'Loading your center...' : 'No center selected'}
           </h3>
           <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-            {isSocietyAdmin 
-              ? 'Please wait while we load your society information.'
+            {isCenterAdmin 
+              ? 'Please wait while we load your center information.'
               : 'Please select a center from the sidebar to view its members.'
             }
           </p>
@@ -187,8 +188,8 @@ const MembersPage: React.FC = () => {
         <MembersTable
           data={membersData?.data || []}
           isLoading={isLoading}
-          onEdit={isSocietyAdmin ? undefined : handleEditMember}
-          onDelete={isSocietyAdmin ? undefined : handleDeleteMember}
+          onEdit={isCenterAdmin ? undefined : handleEditMember}
+          onDelete={isCenterAdmin ? undefined : handleDeleteMember}
         />
       )}
 
