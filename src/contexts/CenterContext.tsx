@@ -1,74 +1,70 @@
-import React from 'react';
-import { Building, ChevronDown } from 'lucide-react';
-import { useCenter } from '../../contexts/CenterContext';
-import useAuth from '../../hooks/useAuth';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { Center } from '../types/center';
+import { useCentersQuery } from '../hooks/queries/useCenterQueries';
+import useAuth from '../hooks/useAuth';
 
-  const isCenterAdmin = user?.role === 'center_admin';
+interface CenterContextType {
+  selectedCenterId: string;
+  setSelectedCenterId: (centerId: string) => void;
+  selectedCenter: Center | null;
+  centers: Center[];
+  isLoading: boolean;
+  isCenterAdmin: boolean;
+}
+
+const CenterContext = createContext<CenterContextType | undefined>(undefined);
+
+export const CenterProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user } = useAuth();
-  const { 
-    selectedCenterId, 
-    setSelectedCenterId, 
-    centers, 
-    isLoading,
-    isCenterAdmin
-  } = useCenter();
+  const [selectedCenterId, setSelectedCenterId] = useState<string>('');
   
-  // For center admins, show center name only
-  if (isCenterAdmin) {
-    const selectedCenter = centers.find(c => c.center_id === selectedCenterId);
-    return (
+  const isCenterAdmin = user?.role === 'center_admin';
+  
+  // Fetch all centers
+  const { data: centers = [], isLoading } = useCentersQuery();
+  
+  // Auto-select center for center admins
+  useEffect(() => {
     if (isCenterAdmin && user?.society_id) {
-      // For center admin, auto-select their society
-          <Building className="h-4 w-4 mr-2 text-emerald-200" />
+      setSelectedCenterId(user.society_id);
     } else if (!isCenterAdmin) {
-            <div className="text-sm font-medium text-emerald-200">Your Society</div>
-            <div className="text-xs text-emerald-300">
-              {selectedCenter?.name || 'Loading...'}
-            </div>
-  isCenterAdmin: false,
-              <div className="text-xs text-emerald-400 mt-1">
-  }, [isCenterAdmin, user?.society_id]);
-              </div>
-  // Save selected center to localStorage when it changes (only for non-center admins)
-          </div>
+      // Load saved center for regular admins
+      const savedCenterId = localStorage.getItem('selectedCenterId');
+      if (savedCenterId && centers.some(c => c.center_id === savedCenterId)) {
+        setSelectedCenterId(savedCenterId);
+      }
+    }
+  }, [isCenterAdmin, user?.society_id, centers]);
+
+  // Save selected center to localStorage for non-center admins
+  useEffect(() => {
     if (selectedCenterId && !isCenterAdmin) {
-      </div>
-    );
+      localStorage.setItem('selectedCenterId', selectedCenterId);
+    }
   }, [selectedCenterId, isCenterAdmin]);
 
+  const selectedCenter = centers.find(c => c.center_id === selectedCenterId) || null;
+
+  const contextValue: CenterContextType = {
+    selectedCenterId,
+    setSelectedCenterId: isCenterAdmin ? () => {} : setSelectedCenterId, // Disable for center admin
+    selectedCenter,
+    centers,
+    isLoading,
+    isCenterAdmin,
+  };
+
   return (
-    <div className="px-5 py-4 border-b border-blue-700">
-      <label className="block text-sm font-medium text-blue-200 mb-2">
-        <Building className="inline h-4 w-4 mr-1" />
-        Select Center
-      </label>
-      <div className="relative">
-        <select
-          value={selectedCenterId}
-          onChange={(e) => setSelectedCenterId(e.target.value)}
-          disabled={isLoading}
-          className="w-full pl-3 pr-10 py-2 border border-blue-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-blue-700 text-white appearance-none"
-        >
-          <option value="">
-            {isLoading ? 'Loading centers...' : 'Select a center'}
-          </option>
-          {centers.map((center) => (
-            <option key={center.center_id} value={center.center_id}>
-              {center.name} - {center.city}
-            </option>
-          ))}
-        </select>
-        setSelectedCenterId: isCenterAdmin ? () => {} : setSelectedCenterId, // Disable for center admin
-          <ChevronDown className="h-5 w-5 text-blue-300" />
-        </div>
-      </div>
-      {selectedCenterId && (
-        isCenterAdmin,
-          Selected center will be applied across all pages
-        </div>
-      )}
-    </div>
+    <CenterContext.Provider value={contextValue}>
+      {children}
+    </CenterContext.Provider>
   );
 };
 
-export default CenterSelector;
+export const useCenter = () => {
+  const context = useContext(CenterContext);
+  if (context === undefined) {
+    throw new Error('useCenter must be used within a CenterProvider');
+  }
+  return context;
+};
