@@ -25,8 +25,8 @@ export const CenterProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   
   // Auto-select center for center admins
   useEffect(() => {
-    if (isCenterAdmin && user?.society_id) {
-      setSelectedCenterId(user.society_id);
+    if (isCenterAdmin && user?.center_id) {
+      setSelectedCenterId(user.center_id);
     } else if (!isCenterAdmin) {
       // Load saved center for regular admins
       const savedCenterId = localStorage.getItem('selectedCenterId');
@@ -34,7 +34,7 @@ export const CenterProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         setSelectedCenterId(savedCenterId);
       }
     }
-  }, [isCenterAdmin, user?.society_id, centers]);
+  }, [isCenterAdmin, user?.center_id, centers]);
 
   // Save selected center to localStorage for non-center admins
   useEffect(() => {

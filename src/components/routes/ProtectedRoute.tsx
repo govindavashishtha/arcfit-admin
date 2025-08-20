@@ -22,8 +22,8 @@ const ProtectedRoute: React.FC = () => {
     return <Navigate to="/login" replace />;
   }
   
-  // Redirect society admins to members page by default
-  if (user?.role === 'society_admin' && window.location.pathname === '/dashboard') {
+  // Redirect center admins to members page by default
+  if (user?.role === 'center_admin' && window.location.pathname === '/dashboard') {
     return <Navigate to="/members" replace />;
   }
 
