@@ -13,7 +13,7 @@ const CenterSelector: React.FC = () => {
     isSocietyAdmin
   } = useCenter();
   
-  // Don't render for society admins
+  // For society admins, show center name only
   if (isSocietyAdmin) {
     const selectedCenter = centers.find(c => c.center_id === selectedCenterId);
     return (
@@ -21,10 +21,15 @@ const CenterSelector: React.FC = () => {
         <div className="flex items-center">
           <Building className="h-4 w-4 mr-2 text-emerald-200" />
           <div>
-            <div className="text-sm font-medium text-emerald-200">Your Center</div>
+            <div className="text-sm font-medium text-emerald-200">Your Society</div>
             <div className="text-xs text-emerald-300">
               {selectedCenter?.name || 'Loading...'}
             </div>
+            {selectedCenter && (
+              <div className="text-xs text-emerald-400 mt-1">
+                {selectedCenter.city}, {selectedCenter.state}
+              </div>
+            )}
           </div>
         </div>
       </div>
