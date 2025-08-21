@@ -1,6 +1,7 @@
 import React from 'react';
 import { Bell, Search, User, LogOut } from 'lucide-react';
 import useAuth from '../../hooks/useAuth';
+import { useCenter } from '../../contexts/CenterContext';
 
 interface HeaderProps {
   toggleDarkMode: () => void;
@@ -9,6 +10,7 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ toggleDarkMode, darkMode }) => {
   const { logout } = useAuth();
+  const { selectedCenter } = useCenter();
 
   const handleLogout = async () => {
     try {
@@ -23,7 +25,7 @@ const Header: React.FC<HeaderProps> = ({ toggleDarkMode, darkMode }) => {
       <div className="flex items-center justify-between px-6 py-4">
         <div className="flex items-center space-x-4">
           <h1 className="text-xl font-semibold text-gray-900 dark:text-white">
-            ArcFit Admin
+            {selectedCenter?.name || 'Center Name'}
           </h1>
         </div>
         
