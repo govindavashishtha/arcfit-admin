@@ -44,14 +44,6 @@ const Header: React.FC<HeaderProps> = ({ toggleDarkMode, darkMode }) => {
             {darkMode ? '☀️' : '🌙'}
           </button>
           
-          <button className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors">
-            <Bell className="w-5 h-5" />
-          </button>
-          
-          <button className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors">
-            <User className="w-5 h-5" />
-          </button>
-          
           <button 
             onClick={handleLogout}
             className="p-2 text-gray-500 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-400 transition-colors"
