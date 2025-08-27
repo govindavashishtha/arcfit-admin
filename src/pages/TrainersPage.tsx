@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { UserCheck, Plus } from 'lucide-react';
+import axios from 'axios';
 import { 
   useTrainersQuery, 
   useDeleteTrainerMutation, 
@@ -101,7 +102,42 @@ const TrainersPage: React.FC = () => {
       setSelectedTrainer(null);
     } catch (error) {
       console.error('Failed to update trainer:', error);
-      toast.error('Failed to update trainer');
+      
+      let errorMessage = 'Failed to update trainer';
+      
+      if (axios.isAxiosError(error)) {
+        if (error.response) {
+          // Server responded with error status
+          const status = error.response.status;
+          const data = error.response.data;
+          
+          if (status === 400) {
+            errorMessage = data?.message || 'Invalid trainer data provided';
+          } else if (status === 401) {
+            errorMessage = 'You are not authorized to update this trainer';
+          } else if (status === 403) {
+            errorMessage = 'You do not have permission to update trainers';
+          } else if (status === 404) {
+            errorMessage = 'Trainer not found';
+          } else if (status === 409) {
+            errorMessage = data?.message || 'A trainer with this information already exists';
+          } else if (status >= 500) {
+            errorMessage = 'Server error occurred. Please try again later';
+          } else {
+            errorMessage = data?.message || `Update failed (${status})`;
+          }
+        } else if (error.request) {
+          // Network error - no response received
+          errorMessage = 'Unable to connect to server. Please check your internet connection';
+        } else {
+          // Request setup error
+          errorMessage = 'Request failed to send. Please try again';
+        }
+      } else if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      
+      toast.error(errorMessage);
       throw error;
     }
   };
