@@ -89,7 +89,7 @@ export const useUpdateTrainerMutation = () => {
     },
     onSuccess: (data, variables) => {
       // Update the specific trainer in cache
-      queryClient.setQueryData(trainerKeys.detail(variables.id.toString()), data);
+      queryClient.setQueryData(trainerKeys.detail(variables.user_id), data);
       
       // Invalidate and refetch trainers list
       queryClient.invalidateQueries({ queryKey: trainerKeys.lists() });
