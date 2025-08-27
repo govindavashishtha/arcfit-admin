@@ -94,7 +94,7 @@ const TrainersPage: React.FC = () => {
 
     try {
       await updateTrainerMutation.mutateAsync({
-        id: selectedTrainer.id,
+        user_id: selectedTrainer.user_id,
         ...data
       });
       toast.success('Trainer updated successfully!');

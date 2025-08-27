@@ -76,5 +76,5 @@ export interface CreateTrainerData {
 }
 
 export interface UpdateTrainerData extends Partial<CreateTrainerData> {
-  id: number;
+  user_id: string;
 }
