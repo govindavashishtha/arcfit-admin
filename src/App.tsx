@@ -12,6 +12,7 @@ import EventsPage from './pages/EventsPage';
 import CenterPage from './pages/CenterPage';
 import DietPlansPage from './pages/DietPlansPage';
 import SubscriptionPlansPage from './pages/SubscriptionPlansPage';
+import BulkMembersPage from './pages/BulkMembersPage';
 import DashboardLayout from './components/layout/DashboardLayout';
 import AuthRoute from './components/routes/AuthRoute';
 import ProtectedRoute from './components/routes/ProtectedRoute';
@@ -41,6 +42,7 @@ function App() {
                   <Route path="/diet-plans" element={<DietPlansPage />} />
                   <Route path="/center" element={<CenterPage />} />
                   <Route path="/subscription-plans" element={<SubscriptionPlansPage />} />
+                  <Route path="/bulk-members" element={<BulkMembersPage />} />
                 </Route>
               </Route>
 
