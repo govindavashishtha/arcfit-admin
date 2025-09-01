@@ -270,4 +270,4 @@ const BulkMemberUploadForm: React.FC<BulkMemberUploadFormProps> = ({
   );
 };
 
-export default BulkMembersPage;
+export default BulkMemberUploadForm;
