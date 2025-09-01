@@ -170,34 +170,14 @@ const BulkMemberUploadForm: React.FC<BulkMemberUploadFormProps> = ({
               <div className="text-sm text-gray-500 dark:text-gray-400">
                 {(selectedFile.size / 1024).toFixed(1)} KB
               </div>
-              <div className="flex justify-center space-x-3">
-                <button
-                  type="button"
-                  onClick={handleUpload}
-                  disabled={isLoading}
-                  className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-blue-300 disabled:cursor-not-allowed"
-                >
-                  {isLoading ? (
-                    <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white mr-2"></div>
-                      Uploading...
-                    </>
-                  ) : (
-                    <>
-                      <Upload className="h-4 w-4 mr-2" />
-                      Upload Members
-                    </>
-                  )}
-                </button>
-                <button
-                  type="button"
-                  onClick={removeFile}
-                  disabled={isLoading}
-                  className="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Remove File
-                </button>
-              </div>
+              <button
+                type="button"
+                onClick={removeFile}
+                disabled={isLoading}
+                className="text-sm text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-200 underline"
+              >
+                Remove file
+              </button>
             </div>
           ) : (
             <div className="space-y-3">
@@ -213,6 +193,30 @@ const BulkMemberUploadForm: React.FC<BulkMemberUploadFormProps> = ({
             </div>
           )}
         </div>
+
+        {/* Upload Button - Outside the drag area */}
+        {selectedFile && (
+          <div className="mt-6 flex justify-center">
+            <button
+              type="button"
+              onClick={handleUpload}
+              disabled={isLoading}
+              className="inline-flex items-center px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-blue-300 disabled:cursor-not-allowed"
+            >
+              {isLoading ? (
+                <>
+                  <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white mr-3"></div>
+                  Uploading Members...
+                </>
+              ) : (
+                <>
+                  <Upload className="h-5 w-5 mr-3" />
+                  Upload {selectedFile.name} to {selectedCenter?.name}
+                </>
+              )}
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Instructions */}
