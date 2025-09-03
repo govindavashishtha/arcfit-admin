@@ -52,6 +52,8 @@ export interface CreateMembershipData {
   payment_method: PaymentMethod;
   additional_days: number;
   is_external: 0 | 1;
+  start_date?: string;
+  end_date?: string;
 }
 
 // Update membership data

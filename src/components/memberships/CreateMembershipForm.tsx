@@ -38,7 +38,9 @@ const CreateMembershipForm: React.FC<CreateMembershipFormProps> = ({
     payment_amount: 0,
     payment_method: 'upi',
     additional_days: 0,
-    is_external: 0
+    is_external: 0,
+    start_date: '',
+    end_date: ''
   });
 
   const [error, setError] = useState<string>('');
@@ -124,7 +126,14 @@ const CreateMembershipForm: React.FC<CreateMembershipFormProps> = ({
     if (name === 'payment_amount' || name === 'additional_days') {
       setFormData(prev => ({ ...prev, [name]: parseFloat(value) || 0 }));
     } else if (name === 'is_external') {
-      setFormData(prev => ({ ...prev, [name]: parseInt(value) as 0 | 1 }));
+      const isExternal = parseInt(value) as 0 | 1;
+      setFormData(prev => ({ 
+        ...prev, 
+        [name]: isExternal,
+        // Clear dates when switching to internal
+        start_date: isExternal === 0 ? '' : prev.start_date,
+        end_date: isExternal === 0 ? '' : prev.end_date
+      }));
     } else {
       setFormData(prev => ({ ...prev, [name]: value }));
     }
@@ -152,6 +161,27 @@ const CreateMembershipForm: React.FC<CreateMembershipFormProps> = ({
     if (!formData.payment_amount || formData.payment_amount <= 0) {
       setError('Please enter a valid payment amount');
       return;
+    }
+
+    // Additional validation for external memberships
+    if (formData.is_external === 1) {
+      if (!formData.start_date) {
+        setError('Start date is required for external memberships');
+        return;
+      }
+      
+      if (!formData.end_date) {
+        setError('End date is required for external memberships');
+        return;
+      }
+      
+      const startDate = new Date(formData.start_date);
+      const endDate = new Date(formData.end_date);
+      
+      if (endDate <= startDate) {
+        setError('End date must be after start date');
+        return;
+      }
     }
 
     try {
@@ -394,6 +424,47 @@ const CreateMembershipForm: React.FC<CreateMembershipFormProps> = ({
             </p>
             </div>
           </div>
+
+          {/* External Membership Date Fields */}
+          {formData.is_external === 1 && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+              <div>
+                <label className="block text-sm font-medium text-blue-800 dark:text-blue-200">
+                  Start Date *
+                </label>
+                <input
+                  type="date"
+                  name="start_date"
+                  value={formData.start_date}
+                  onChange={handleChange}
+                  required={formData.is_external === 1}
+                  className="mt-1 block w-full rounded-md border-blue-300 dark:border-blue-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-blue-800 dark:text-blue-200">
+                  End Date *
+                </label>
+                <input
+                  type="date"
+                  name="end_date"
+                  value={formData.end_date}
+                  onChange={handleChange}
+                  required={formData.is_external === 1}
+                  min={formData.start_date}
+                  className="mt-1 block w-full rounded-md border-blue-300 dark:border-blue-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                />
+              </div>
+
+              <div className="md:col-span-2">
+                <div className="flex items-center text-sm text-blue-700 dark:text-blue-300">
+                  <Calendar className="h-4 w-4 mr-2" />
+                  <span>External memberships require custom start and end dates</span>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {error && (
