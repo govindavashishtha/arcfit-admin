@@ -33,6 +33,7 @@ export interface Membership {
 
 // Membership types
 export type MembershipType = '1D' | '15D' | '1M' | '3M' | '6M' | '12M';
+export type MembershipType = 'NA' | '1D' | '15D' | '1M' | '3M' | '6M' | '12M';
 
 // Membership status
 export type MembershipStatus = 'active' | 'expired' | 'paused' | 'cancelled';
@@ -50,6 +51,7 @@ export interface CreateMembershipData {
   payment_amount: number;
   payment_method: PaymentMethod;
   additional_days: number;
+  is_external: 0 | 1;
 }
 
 // Update membership data

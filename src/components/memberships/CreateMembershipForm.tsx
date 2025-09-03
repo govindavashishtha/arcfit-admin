@@ -37,7 +37,8 @@ const CreateMembershipForm: React.FC<CreateMembershipFormProps> = ({
     max_allowed_pause_days: 0,
     payment_amount: 0,
     payment_method: 'upi',
-    additional_days: 0
+    additional_days: 0,
+    is_external: 0
   });
 
   const [error, setError] = useState<string>('');
@@ -50,6 +51,7 @@ const CreateMembershipForm: React.FC<CreateMembershipFormProps> = ({
   const selectedCenter = centers.find(c => c.center_id === selectedCenterId);
 
   const membershipTypes = [
+    { value: 'NA', label: 'Not Applicable', defaultPrice: 0 },
     { value: '1D', label: '1 Day', defaultPrice: 269 },
     { value: '15D', label: '15 Days', defaultPrice: 1799 },
     { value: '1M', label: '1 Month', defaultPrice: 2999 },
@@ -84,7 +86,7 @@ const CreateMembershipForm: React.FC<CreateMembershipFormProps> = ({
       let isPauseAllowed = false;
       let maxPauseDays = 0;
 
-      if (formData.type === '1D' || formData.type === '15D') {
+      if (formData.type === 'NA' || formData.type === '1D' || formData.type === '15D') {
         isPauseAllowed = false;
         maxPauseDays = 0;
       } else if (formData.type === '6M') {
@@ -121,6 +123,8 @@ const CreateMembershipForm: React.FC<CreateMembershipFormProps> = ({
     
     if (name === 'payment_amount' || name === 'additional_days') {
       setFormData(prev => ({ ...prev, [name]: parseFloat(value) || 0 }));
+    } else if (name === 'is_external') {
+      setFormData(prev => ({ ...prev, [name]: parseInt(value) as 0 | 1 }));
     } else {
       setFormData(prev => ({ ...prev, [name]: value }));
     }
@@ -352,7 +356,26 @@ const CreateMembershipForm: React.FC<CreateMembershipFormProps> = ({
             Additional Settings
           </h3>
           
-          <div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                External Membership
+              </label>
+              <select
+                name="is_external"
+                value={formData.is_external}
+                onChange={handleChange}
+                className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+              >
+                <option value={0}>Internal Membership</option>
+                <option value={1}>External Membership</option>
+              </select>
+              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                Whether this is an external or internal membership
+              </p>
+            </div>
+
+            <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
               Additional Days
             </label>
@@ -369,6 +392,7 @@ const CreateMembershipForm: React.FC<CreateMembershipFormProps> = ({
             <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
               Extra days to add to the membership duration (0-365 days)
             </p>
+            </div>
           </div>
         </div>
 

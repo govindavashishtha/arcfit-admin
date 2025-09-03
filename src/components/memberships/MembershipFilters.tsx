@@ -27,6 +27,7 @@ const MembershipFilters: React.FC<MembershipFiltersProps> = ({
   const hasActiveFilters = Object.values(filters).some(value => value && value !== '');
 
   const membershipTypes = [
+    { value: 'NA', label: 'Not Applicable' },
     { value: '1D', label: '1 Day' },
     { value: '15D', label: '15 Days' },
     { value: '1M', label: '1 Month' },
