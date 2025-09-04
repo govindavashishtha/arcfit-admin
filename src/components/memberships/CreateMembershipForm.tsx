@@ -31,12 +31,12 @@ const CreateMembershipForm: React.FC<CreateMembershipFormProps> = ({
   
   const [formData, setFormData] = useState<CreateMembershipData>({
     user_id: '',
-    type: '1M',
+    type: 'NA',
     transaction_id: '',
     is_paused_allowed: false,
     max_allowed_pause_days: 0,
     payment_amount: 0,
-    payment_method: 'upi',
+    payment_method: 'cash',
     additional_days: 0,
     is_external: 0,
     start_date: '',
@@ -63,10 +63,10 @@ const CreateMembershipForm: React.FC<CreateMembershipFormProps> = ({
   ];
 
   const paymentMethods = [
+    { value: 'cash', label: 'Cash', icon: '💵' },
     { value: 'upi', label: 'UPI', icon: '📱' },
     { value: 'credit_card', label: 'Credit Card', icon: '💳' },
     { value: 'debit_card', label: 'Debit Card', icon: '💳' },
-    { value: 'cash', label: 'Cash', icon: '💵' },
   ];
 
   // Generate random transaction ID
@@ -83,8 +83,21 @@ const CreateMembershipForm: React.FC<CreateMembershipFormProps> = ({
   }, []);
 
   useEffect(() => {
-    // Update pause settings based on membership type
-    const updatePauseSettings = () => {
+    // Handle form data changes based on external/internal membership
+    if (formData.is_external === 1) {
+      // External membership: force specific values
+      setFormData(prev => ({
+        ...prev,
+        type: 'NA',
+        payment_method: 'cash',
+        payment_amount: 0,
+        is_paused_allowed: false,
+        max_allowed_pause_days: 0,
+        additional_days: 0,
+        transaction_id: ''
+      }));
+    } else {
+      // Internal membership: update pause settings and pricing
       let isPauseAllowed = false;
       let maxPauseDays = 0;
 
@@ -99,26 +112,18 @@ const CreateMembershipForm: React.FC<CreateMembershipFormProps> = ({
         maxPauseDays = 28;
       }
 
+      const selectedType = membershipTypes.find(type => type.value === formData.type);
+      const defaultPrice = selectedType ? selectedType.defaultPrice : 0;
+
       setFormData(prev => ({
         ...prev,
         is_paused_allowed: isPauseAllowed,
-        max_allowed_pause_days: maxPauseDays
-      }));
-    };
-
-    updatePauseSettings();
-  }, [formData.type]);
-
-  useEffect(() => {
-    // Update default price based on membership type
-    const selectedType = membershipTypes.find(type => type.value === formData.type);
-    if (selectedType) {
-      setFormData(prev => ({
-        ...prev,
-        payment_amount: selectedType.defaultPrice
+        max_allowed_pause_days: maxPauseDays,
+        payment_amount: defaultPrice,
+        transaction_id: prev.transaction_id || generateTransactionId()
       }));
     }
-  }, [formData.type]);
+  }, [formData.type, formData.is_external]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -130,9 +135,9 @@ const CreateMembershipForm: React.FC<CreateMembershipFormProps> = ({
       setFormData(prev => ({ 
         ...prev, 
         [name]: isExternal,
-        // Clear dates when switching to internal
-        start_date: isExternal === 0 ? '' : prev.start_date,
-        end_date: isExternal === 0 ? '' : prev.end_date
+        // Reset form when switching between external/internal
+        start_date: '',
+        end_date: ''
       }));
     } else {
       setFormData(prev => ({ ...prev, [name]: value }));
@@ -185,7 +190,28 @@ const CreateMembershipForm: React.FC<CreateMembershipFormProps> = ({
     }
 
     try {
-      await onSubmit(formData);
+      // Format the data for API - ensure strict payload for external memberships
+      let submitData;
+      
+      if (formData.is_external === 1) {
+        // Strict payload for external memberships
+        submitData = {
+          user_id: formData.user_id,
+          type: 'NA' as const,
+          start_date: `${formData.start_date}T00:00:00Z`,
+          end_date: `${formData.end_date}T00:00:00Z`,
+          payment_method: 'cash' as const,
+          is_external: true
+        };
+      } else {
+        // Full payload for internal memberships
+        submitData = {
+          ...formData,
+          is_external: false
+        };
+      }
+
+      await onSubmit(submitData);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred while creating the membership');
     }
@@ -214,7 +240,35 @@ const CreateMembershipForm: React.FC<CreateMembershipFormProps> = ({
       </div>
 
       <form onSubmit={handleSubmit} className="p-6 space-y-6">
-        {/* Society Info */}
+        {/* External/Internal Membership Toggle */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white flex items-center">
+            <Building className="h-5 w-5 mr-2" />
+            Membership Type
+          </h3>
+          
+          <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Membership Category *
+            </label>
+            <select
+              name="is_external"
+              value={formData.is_external}
+              onChange={handleChange}
+              className="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+            >
+              <option value={0}>Internal Membership</option>
+              <option value={1}>External Membership</option>
+            </select>
+            <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+              {formData.is_external === 1 
+                ? 'External memberships use simplified data with custom date ranges'
+                : 'Internal memberships include full billing and plan management features'
+              }
+            </p>
+          </div>
+        </div>
+
         {/* Center Info */}
         <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
           <div className="flex items-center">
@@ -252,220 +306,222 @@ const CreateMembershipForm: React.FC<CreateMembershipFormProps> = ({
           )}
         </div>
 
-        {/* Membership Details */}
-        <div className="space-y-4">
-          <h3 className="text-lg font-medium text-gray-900 dark:text-white flex items-center">
-            <Calendar className="h-5 w-5 mr-2" />
-            Membership Details
-          </h3>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Membership Type *
-              </label>
-              <select
-                name="type"
-                value={formData.type}
-                onChange={handleChange}
-                required
-                className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
-              >
-                {membershipTypes.map((type) => (
-                  <option key={type.value} value={type.value}>
-                    {type.label} - ₹{type.defaultPrice}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Transaction ID
-              </label>
-              <div className="mt-1 relative rounded-md shadow-sm">
-                <input
-                  type="text"
-                  name="transaction_id"
-                  value={formData.transaction_id}
-                  onChange={handleChange}
-                  required
-                  readOnly
-                  className="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:text-white bg-gray-50 dark:bg-gray-600"
-                />
-                <button
-                  type="button"
-                  onClick={() => setFormData(prev => ({ ...prev, transaction_id: generateTransactionId() }))}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-200"
-                >
-                  Regenerate
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Pause Settings Display */}
-          <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
-            <h4 className="text-sm font-medium text-gray-900 dark:text-white flex items-center mb-2">
-              <Pause className="h-4 w-4 mr-2" />
-              Pause Settings
-            </h4>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-              <div className="flex items-center">
-                <div className={`w-4 h-4 rounded-full mr-2 ${
-                  formData.is_paused_allowed ? 'bg-green-500' : 'bg-red-500'
-                }`}></div>
-                <span className="text-gray-700 dark:text-gray-300">
-                  Pause Allowed: {formData.is_paused_allowed ? 'Yes' : 'No'}
-                </span>
-              </div>
-              <div className="flex items-center">
-                <Clock className="h-4 w-4 mr-2 text-gray-400" />
-                <span className="text-gray-700 dark:text-gray-300">
-                  Max Pause Days: {formData.max_allowed_pause_days}
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Payment Information */}
-        <div className="space-y-4">
-          <h3 className="text-lg font-medium text-gray-900 dark:text-white flex items-center">
-            <IndianRupee className="h-5 w-5 mr-2" />
-            Payment Information
-          </h3>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Payment Amount (₹) *
-              </label>
-              <div className="mt-1 relative rounded-md shadow-sm">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <span className="text-gray-500 dark:text-gray-400 text-sm">₹</span>
+        {/* Conditional Form Fields */}
+        {formData.is_external === 1 ? (
+          /* External Membership Fields */
+          <div className="space-y-6">
+            {/* Date Fields for External */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white flex items-center">
+                <Calendar className="h-5 w-5 mr-2" />
+                Membership Duration
+              </h3>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Start Date *
+                  </label>
+                  <input
+                    type="date"
+                    name="start_date"
+                    value={formData.start_date}
+                    onChange={handleChange}
+                    required
+                    className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                  />
                 </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    End Date *
+                  </label>
+                  <input
+                    type="date"
+                    name="end_date"
+                    value={formData.end_date}
+                    onChange={handleChange}
+                    required
+                    min={formData.start_date}
+                    className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                  />
+                </div>
+              </div>
+
+              {/* External Membership Info */}
+              <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                <div className="space-y-2 text-sm">
+                  <div className="flex items-center text-blue-800 dark:text-blue-200">
+                    <span className="font-medium">External Membership Settings:</span>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-blue-700 dark:text-blue-300">
+                    <div>• Type: NA (Not Applicable)</div>
+                    <div>• Payment Method: Cash</div>
+                    <div>• Payment Amount: ₹0</div>
+                    <div>• Pause: Not Allowed</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : (
+          /* Internal Membership Fields */
+          <div className="space-y-6">
+            {/* Membership Details */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white flex items-center">
+                <Calendar className="h-5 w-5 mr-2" />
+                Membership Details
+              </h3>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Membership Type *
+                  </label>
+                  <select
+                    name="type"
+                    value={formData.type}
+                    onChange={handleChange}
+                    required
+                    className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                  >
+                    {membershipTypes.map((type) => (
+                      <option key={type.value} value={type.value}>
+                        {type.label} - ₹{type.defaultPrice}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Transaction ID
+                  </label>
+                  <div className="mt-1 relative rounded-md shadow-sm">
+                    <input
+                      type="text"
+                      name="transaction_id"
+                      value={formData.transaction_id}
+                      onChange={handleChange}
+                      required
+                      readOnly
+                      className="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:text-white bg-gray-50 dark:bg-gray-600"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setFormData(prev => ({ ...prev, transaction_id: generateTransactionId() }))}
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-200"
+                    >
+                      Regenerate
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Pause Settings Display */}
+              <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                <h4 className="text-sm font-medium text-gray-900 dark:text-white flex items-center mb-2">
+                  <Pause className="h-4 w-4 mr-2" />
+                  Pause Settings
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                  <div className="flex items-center">
+                    <div className={`w-4 h-4 rounded-full mr-2 ${
+                      formData.is_paused_allowed ? 'bg-green-500' : 'bg-red-500'
+                    }`}></div>
+                    <span className="text-gray-700 dark:text-gray-300">
+                      Pause Allowed: {formData.is_paused_allowed ? 'Yes' : 'No'}
+                    </span>
+                  </div>
+                  <div className="flex items-center">
+                    <Clock className="h-4 w-4 mr-2 text-gray-400" />
+                    <span className="text-gray-700 dark:text-gray-300">
+                      Max Pause Days: {formData.max_allowed_pause_days}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Payment Information */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white flex items-center">
+                <IndianRupee className="h-5 w-5 mr-2" />
+                Payment Information
+              </h3>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Payment Amount (₹) *
+                  </label>
+                  <div className="mt-1 relative rounded-md shadow-sm">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <span className="text-gray-500 dark:text-gray-400 text-sm">₹</span>
+                    </div>
+                    <input
+                      type="number"
+                      name="payment_amount"
+                      value={formData.payment_amount}
+                      onChange={handleChange}
+                      required
+                      min="1"
+                      step="0.01"
+                      className="pl-8 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Payment Method *
+                  </label>
+                  <select
+                    name="payment_method"
+                    value={formData.payment_method}
+                    onChange={handleChange}
+                    required
+                    className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                  >
+                    {paymentMethods.map((method) => (
+                      <option key={method.value} value={method.value}>
+                        {method.icon} {method.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            {/* Additional Settings */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white flex items-center">
+                <Clock className="h-5 w-5 mr-2" />
+                Additional Settings
+              </h3>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Additional Days
+                </label>
                 <input
                   type="number"
-                  name="payment_amount"
-                  value={formData.payment_amount}
+                  name="additional_days"
+                  value={formData.additional_days}
                   onChange={handleChange}
-                  required
-                  min="1"
-                  step="0.01"
-                  className="pl-8 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                  min="0"
+                  max="365"
+                  className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                  placeholder="0"
                 />
+                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                  Extra days to add to the membership duration (0-365 days)
+                </p>
               </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Payment Method *
-              </label>
-              <select
-                name="payment_method"
-                value={formData.payment_method}
-                onChange={handleChange}
-                required
-                className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
-              >
-                {paymentMethods.map((method) => (
-                  <option key={method.value} value={method.value}>
-                    {method.icon} {method.label}
-                  </option>
-                ))}
-              </select>
             </div>
           </div>
-        </div>
-
-        {/* Additional Settings */}
-        <div className="space-y-4">
-          <h3 className="text-lg font-medium text-gray-900 dark:text-white flex items-center">
-            <Clock className="h-5 w-5 mr-2" />
-            Additional Settings
-          </h3>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                External Membership
-              </label>
-              <select
-                name="is_external"
-                value={formData.is_external}
-                onChange={handleChange}
-                className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
-              >
-                <option value={0}>Internal Membership</option>
-                <option value={1}>External Membership</option>
-              </select>
-              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                Whether this is an external or internal membership
-              </p>
-            </div>
-
-            <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-              Additional Days
-            </label>
-            <input
-              type="number"
-              name="additional_days"
-              value={formData.additional_days}
-              onChange={handleChange}
-              min="0"
-              max="365"
-              className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
-              placeholder="0"
-            />
-            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-              Extra days to add to the membership duration (0-365 days)
-            </p>
-            </div>
-          </div>
-
-          {/* External Membership Date Fields */}
-          {formData.is_external === 1 && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
-              <div>
-                <label className="block text-sm font-medium text-blue-800 dark:text-blue-200">
-                  Start Date *
-                </label>
-                <input
-                  type="date"
-                  name="start_date"
-                  value={formData.start_date}
-                  onChange={handleChange}
-                  required={formData.is_external === 1}
-                  className="mt-1 block w-full rounded-md border-blue-300 dark:border-blue-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-blue-800 dark:text-blue-200">
-                  End Date *
-                </label>
-                <input
-                  type="date"
-                  name="end_date"
-                  value={formData.end_date}
-                  onChange={handleChange}
-                  required={formData.is_external === 1}
-                  min={formData.start_date}
-                  className="mt-1 block w-full rounded-md border-blue-300 dark:border-blue-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
-                />
-              </div>
-
-              <div className="md:col-span-2">
-                <div className="flex items-center text-sm text-blue-700 dark:text-blue-300">
-                  <Calendar className="h-4 w-4 mr-2" />
-                  <span>External memberships require custom start and end dates</span>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
+        )}
 
         {error && (
           <div className="bg-red-50 dark:bg-red-900/20 border-l-4 border-red-400 p-4">
