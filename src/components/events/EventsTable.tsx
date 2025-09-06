@@ -33,7 +33,7 @@ import {
 import { useCancelEventMutation } from '../../hooks/queries/useEventQueries';
 import toast from 'react-hot-toast';
 import ConfirmationModal from '../ui/ConfirmationModal';
-import { formatDateToIST, formatTimeToIST } from '../../utils/dateUtils';
+import { formatDateToIST, formatTimeToIST, formatDateTimeToIST } from '../../utils/dateUtils';
 
 interface EventsTableProps {
   data: Event[];
