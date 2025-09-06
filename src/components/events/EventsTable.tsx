@@ -245,14 +245,24 @@ const EventsTable: React.FC<EventsTableProps> = ({
           );
         }
         
+        // Parse the ISO string and format directly without timezone conversion
+        const date = new Date(attendanceTime);
+        const formattedDate = date.toLocaleDateString('en-GB', {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric'
+        });
+        const formattedTime = date.toLocaleTimeString('en-US', {
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: true
+        });
+        
         return (
           <div className="space-y-1">
             <div className="flex items-center text-sm text-gray-900 dark:text-white">
               <Clock className="h-3 w-3 mr-1 text-green-500" />
-              {formatDateTimeToIST(attendanceTime)}
-            </div>
-            <div className="text-xs text-blue-600 dark:text-blue-400 font-medium">
-              IST
+              {formattedDate}, {formattedTime}
             </div>
           </div>
         );
