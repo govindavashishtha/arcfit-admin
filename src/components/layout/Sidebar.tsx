@@ -60,7 +60,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isMobile }) => {
       name: 'Events',
       path: '/events',
       icon: <Calendar className="w-5 h-5" />,
-      roles: ['admin', 'super_admin'], // Only for admins
+      roles: ['admin', 'super_admin', 'center_admin'], // Available for center admins
     },
     {
       name: 'Diet Plans',
