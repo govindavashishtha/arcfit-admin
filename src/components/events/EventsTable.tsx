@@ -231,6 +231,33 @@ const EventsTable: React.FC<EventsTableProps> = ({
         );
       },
     }),
+    columnHelper.accessor('trainer_attendance_time', {
+      header: 'Trainer Attendance',
+      cell: ({ getValue }) => {
+        const attendanceTime = getValue();
+        
+        if (!attendanceTime) {
+          return (
+            <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
+              <Clock className="h-3 w-3 mr-1 text-gray-400" />
+              Not marked
+            </div>
+          );
+        }
+        
+        return (
+          <div className="space-y-1">
+            <div className="flex items-center text-sm text-gray-900 dark:text-white">
+              <Clock className="h-3 w-3 mr-1 text-green-500" />
+              {formatDateTimeToIST(attendanceTime)}
+            </div>
+            <div className="text-xs text-blue-600 dark:text-blue-400 font-medium">
+              IST
+            </div>
+          </div>
+        );
+      },
+    }),
     columnHelper.accessor('meta_data.muscleGroups', {
       header: 'Focus Areas',
       cell: ({ getValue }) => {

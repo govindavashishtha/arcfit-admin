@@ -39,6 +39,7 @@ export interface Event {
   remaining_slots: number
   status: 'scheduled' | 'cancelled' | 'completed'
   meta_data?: EventMetaData
+  trainer_attendance_time?: string
   created_at: string
   updated_at: string
 }
