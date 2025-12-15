@@ -23,7 +23,6 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ event, isOpen, onClose 
   });
 
   const [formData, setFormData] = useState({
-    type: '',
     trainer_id: '',
     meta_data: {
       name: '',
@@ -53,7 +52,6 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ event, isOpen, onClose 
   useEffect(() => {
     if (event) {
       setFormData({
-        type: event.type,
         trainer_id: event.trainer_id,
         meta_data: {
           name: event.meta_data?.name || '',
@@ -78,7 +76,6 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ event, isOpen, onClose 
 
     try {
       const updateData = {
-        type: formData.type,
         trainer_id: formData.trainer_id,
         meta_data: formData.meta_data
       };
@@ -161,39 +158,20 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ event, isOpen, onClose 
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Event Name
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.meta_data.name}
-                    onChange={(e) => setFormData(prev => ({
-                      ...prev,
-                      meta_data: { ...prev.meta_data, name: e.target.value }
-                    }))}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Event Type
-                  </label>
-                  <select
-                    value={formData.type}
-                    onChange={(e) => setFormData(prev => ({ ...prev, type: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-                    required
-                  >
-                    <option value="yoga">Yoga</option>
-                    <option value="dance">Dance</option>
-                    <option value="pilates">Pilates</option>
-                    <option value="aerobics">Aerobics</option>
-                  </select>
-                </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Event Name
+                </label>
+                <input
+                  type="text"
+                  value={formData.meta_data.name}
+                  onChange={(e) => setFormData(prev => ({
+                    ...prev,
+                    meta_data: { ...prev.meta_data, name: e.target.value }
+                  }))}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                  required
+                />
               </div>
 
               <div>
