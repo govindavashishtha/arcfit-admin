@@ -23,10 +23,6 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ event, isOpen, onClose 
   });
 
   const [formData, setFormData] = useState({
-    date: '',
-    start_time: '',
-    end_time: '',
-    max_slots: 0,
     type: '',
     trainer_id: '',
     meta_data: {
@@ -56,27 +52,7 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ event, isOpen, onClose 
 
   useEffect(() => {
     if (event) {
-      const startDate = new Date(event.start_time);
-      const endDate = new Date(event.end_time);
-
-      const formatDateForInput = (date: Date) => {
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
-        return `${year}-${month}-${day}`;
-      };
-
-      const formatTimeForInput = (date: Date) => {
-        const hours = String(date.getHours()).padStart(2, '0');
-        const minutes = String(date.getMinutes()).padStart(2, '0');
-        return `${hours}:${minutes}`;
-      };
-
       setFormData({
-        date: formatDateForInput(startDate),
-        start_time: formatTimeForInput(startDate),
-        end_time: formatTimeForInput(endDate),
-        max_slots: event.max_slots,
         type: event.type,
         trainer_id: event.trainer_id,
         meta_data: {
@@ -101,21 +77,7 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ event, isOpen, onClose 
     if (!event) return;
 
     try {
-      const dateObj = new Date(formData.date);
-      const [startHours, startMinutes] = formData.start_time.split(':');
-      const [endHours, endMinutes] = formData.end_time.split(':');
-
-      const startDateTime = new Date(dateObj);
-      startDateTime.setHours(parseInt(startHours), parseInt(startMinutes), 0, 0);
-
-      const endDateTime = new Date(dateObj);
-      endDateTime.setHours(parseInt(endHours), parseInt(endMinutes), 0, 0);
-
       const updateData = {
-        date: formData.date,
-        start_time: startDateTime.toISOString(),
-        end_time: endDateTime.toISOString(),
-        max_slots: formData.max_slots,
         type: formData.type,
         trainer_id: formData.trainer_id,
         meta_data: formData.meta_data
@@ -304,81 +266,24 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ event, isOpen, onClose 
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Level
-                  </label>
-                  <select
-                    value={formData.meta_data.level}
-                    onChange={(e) => setFormData(prev => ({
-                      ...prev,
-                      meta_data: { ...prev.meta_data, level: e.target.value }
-                    }))}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-                    required
-                  >
-                    <option value="">Select Level</option>
-                    <option value="beginner">Beginner</option>
-                    <option value="intermediate">Intermediate</option>
-                    <option value="advanced">Advanced</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Max Slots
-                  </label>
-                  <input
-                    type="number"
-                    value={formData.max_slots}
-                    onChange={(e) => setFormData(prev => ({ ...prev, max_slots: parseInt(e.target.value) }))}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-                    min="1"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Date
-                  </label>
-                  <input
-                    type="date"
-                    value={formData.date}
-                    onChange={(e) => setFormData(prev => ({ ...prev, date: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Start Time
-                  </label>
-                  <input
-                    type="time"
-                    value={formData.start_time}
-                    onChange={(e) => setFormData(prev => ({ ...prev, start_time: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    End Time
-                  </label>
-                  <input
-                    type="time"
-                    value={formData.end_time}
-                    onChange={(e) => setFormData(prev => ({ ...prev, end_time: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-                    required
-                  />
-                </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Level
+                </label>
+                <select
+                  value={formData.meta_data.level}
+                  onChange={(e) => setFormData(prev => ({
+                    ...prev,
+                    meta_data: { ...prev.meta_data, level: e.target.value }
+                  }))}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                  required
+                >
+                  <option value="">Select Level</option>
+                  <option value="beginner">Beginner</option>
+                  <option value="intermediate">Intermediate</option>
+                  <option value="advanced">Advanced</option>
+                </select>
               </div>
 
               <div>
