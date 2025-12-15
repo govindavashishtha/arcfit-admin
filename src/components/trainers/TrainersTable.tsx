@@ -119,7 +119,7 @@ const TrainersTable: React.FC<TrainersTableProps> = ({
     columnHelper.accessor('specialisations', {
       header: 'Specializations',
       cell: ({ getValue }) => {
-        const specializations = getValue() || [];
+        const specializations = getValue();
         return (
           <div className="space-y-1">
             {specializations.slice(0, 2).map((spec, index) => (
@@ -151,7 +151,7 @@ const TrainersTable: React.FC<TrainersTableProps> = ({
     columnHelper.accessor('centers', {
       header: 'Centers',
       cell: ({ getValue }) => {
-        const centers = getValue() || [];
+        const centers = getValue();
         return (
           <div className="space-y-1">
             {centers.slice(0, 2).map((center, index) => (

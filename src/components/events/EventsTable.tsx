@@ -10,10 +10,10 @@ import {
   ColumnDef,
 } from '@tanstack/react-table';
 import { Event } from '../../types/event';
-import {
-  ChevronLeft,
-  ChevronRight,
-  ChevronsLeft,
+import { 
+  ChevronLeft, 
+  ChevronRight, 
+  ChevronsLeft, 
   ChevronsRight,
   ArrowUpDown,
   ArrowUp,
@@ -28,8 +28,7 @@ import {
   Dumbbell,
   Star,
   X,
-  AlertTriangle,
-  Edit2
+  AlertTriangle
 } from 'lucide-react';
 import { useCancelEventMutation } from '../../hooks/queries/useEventQueries';
 import toast from 'react-hot-toast';
@@ -39,15 +38,13 @@ import { formatDateToIST, formatTimeToIST, formatDateTimeToIST } from '../../uti
 interface EventsTableProps {
   data: Event[];
   isLoading: boolean;
-  onEdit?: (event: Event) => void;
 }
 
 const columnHelper = createColumnHelper<Event>();
 
 const EventsTable: React.FC<EventsTableProps> = ({
   data,
-  isLoading,
-  onEdit
+  isLoading
 }) => {
   const cancelEventMutation = useCancelEventMutation();
   const [eventToCancel, setEventToCancel] = useState<Event | null>(null);
@@ -314,19 +311,9 @@ const EventsTable: React.FC<EventsTableProps> = ({
       cell: ({ row }) => {
         const event = row.original;
         const canCancel = event.status === 'scheduled';
-        const canEdit = event.status === 'scheduled';
-
+        
         return (
           <div className="flex space-x-2">
-            {canEdit && onEdit && (
-              <button
-                onClick={() => onEdit(event)}
-                className="p-2 text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
-                title="Edit event"
-              >
-                <Edit2 className="h-4 w-4" />
-              </button>
-            )}
             {canCancel && (
               <button
                 onClick={() => handleCancelEvent(event)}
@@ -341,7 +328,7 @@ const EventsTable: React.FC<EventsTableProps> = ({
         );
       },
     }),
-  ], [cancelEventMutation.isPending, onEdit]);
+  ], [cancelEventMutation.isPending]);
 
   const table = useReactTable({
     data,
