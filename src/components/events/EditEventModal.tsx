@@ -1,7 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Event } from '../../types/event';
-import { X, Calendar, Clock, Users, MapPin } from 'lucide-react';
+import { X, Calendar, Clock, Users, MapPin, Search } from 'lucide-react';
 import { useUpdateEventMutation } from '../../hooks/queries/useEventQueries';
+import { useTrainersQuery } from '../../hooks/queries/useTrainerQueries';
+import { useCenter } from '../../contexts/CenterContext';
 import toast from 'react-hot-toast';
 
 interface EditEventModalProps {
@@ -12,6 +14,13 @@ interface EditEventModalProps {
 
 const EditEventModal: React.FC<EditEventModalProps> = ({ event, isOpen, onClose }) => {
   const updateEventMutation = useUpdateEventMutation();
+  const { selectedCenterId } = useCenter();
+
+  const { data: trainersData, isLoading: trainersLoading } = useTrainersQuery({
+    center_id: selectedCenterId || undefined,
+    status: 'active',
+    limit: 100
+  });
 
   const [formData, setFormData] = useState({
     date: '',
@@ -19,6 +28,7 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ event, isOpen, onClose 
     end_time: '',
     max_slots: 0,
     type: '',
+    trainer_id: '',
     meta_data: {
       name: '',
       level: '',
@@ -29,6 +39,20 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ event, isOpen, onClose 
   });
 
   const [muscleGroupInput, setMuscleGroupInput] = useState('');
+  const [trainerSearchQuery, setTrainerSearchQuery] = useState('');
+  const [showTrainerDropdown, setShowTrainerDropdown] = useState(false);
+
+  const filteredTrainers = useMemo(() => {
+    if (!trainersData?.data) return [];
+
+    if (!trainerSearchQuery) return trainersData.data;
+
+    const query = trainerSearchQuery.toLowerCase();
+    return trainersData.data.filter(trainer =>
+      `${trainer.first_name} ${trainer.last_name}`.toLowerCase().includes(query) ||
+      trainer.email.toLowerCase().includes(query)
+    );
+  }, [trainersData, trainerSearchQuery]);
 
   useEffect(() => {
     if (event) {
@@ -54,6 +78,7 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ event, isOpen, onClose 
         end_time: formatTimeForInput(endDate),
         max_slots: event.max_slots,
         type: event.type,
+        trainer_id: event.trainer_id,
         meta_data: {
           name: event.meta_data?.name || '',
           level: event.meta_data?.level || '',
@@ -62,8 +87,13 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ event, isOpen, onClose 
           averageCaloriesBurned: event.meta_data?.averageCaloriesBurned || 0,
         }
       });
+
+      const currentTrainer = trainersData?.data.find(t => t.user_id === event.trainer_id);
+      if (currentTrainer) {
+        setTrainerSearchQuery(`${currentTrainer.first_name} ${currentTrainer.last_name}`);
+      }
     }
-  }, [event]);
+  }, [event, trainersData]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -87,6 +117,7 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ event, isOpen, onClose 
         end_time: endDateTime.toISOString(),
         max_slots: formData.max_slots,
         type: formData.type,
+        trainer_id: formData.trainer_id,
         meta_data: formData.meta_data
       };
 
@@ -125,6 +156,23 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ event, isOpen, onClose 
       }
     }));
   };
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (!target.closest('.trainer-dropdown-container')) {
+        setShowTrainerDropdown(false);
+      }
+    };
+
+    if (showTrainerDropdown) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showTrainerDropdown]);
 
   if (!isOpen || !event) return null;
 
@@ -181,8 +229,78 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ event, isOpen, onClose 
                     <option value="yoga">Yoga</option>
                     <option value="dance">Dance</option>
                     <option value="pilates">Pilates</option>
-                    <option value="fitness">Fitness</option>
+                    <option value="aerobics">Aerobics</option>
                   </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Trainer
+                </label>
+                <div className="relative trainer-dropdown-container">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    <input
+                      type="text"
+                      value={trainerSearchQuery}
+                      onChange={(e) => {
+                        setTrainerSearchQuery(e.target.value);
+                        setShowTrainerDropdown(true);
+                      }}
+                      onFocus={() => setShowTrainerDropdown(true)}
+                      placeholder="Search trainer..."
+                      className="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                      required={!formData.trainer_id}
+                    />
+                  </div>
+
+                  {showTrainerDropdown && (
+                    <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-lg max-h-60 overflow-auto">
+                      {trainersLoading ? (
+                        <div className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">
+                          Loading trainers...
+                        </div>
+                      ) : filteredTrainers.length === 0 ? (
+                        <div className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">
+                          No trainers found
+                        </div>
+                      ) : (
+                        filteredTrainers.map((trainer) => (
+                          <button
+                            key={trainer.user_id}
+                            type="button"
+                            onClick={() => {
+                              setFormData(prev => ({ ...prev, trainer_id: trainer.user_id }));
+                              setTrainerSearchQuery(`${trainer.first_name} ${trainer.last_name}`);
+                              setShowTrainerDropdown(false);
+                            }}
+                            className={`w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 ${
+                              formData.trainer_id === trainer.user_id
+                                ? 'bg-blue-50 dark:bg-blue-900/20'
+                                : ''
+                            }`}
+                          >
+                            <div className="flex items-center space-x-3">
+                              <div className="flex-shrink-0 h-8 w-8 rounded-full bg-gradient-to-r from-green-500 to-blue-600 flex items-center justify-center">
+                                <span className="font-medium text-white text-xs">
+                                  {trainer.first_name.charAt(0)}{trainer.last_name.charAt(0)}
+                                </span>
+                              </div>
+                              <div>
+                                <div className="text-sm font-medium text-gray-900 dark:text-white">
+                                  {trainer.first_name} {trainer.last_name}
+                                </div>
+                                <div className="text-xs text-gray-500 dark:text-gray-400">
+                                  {trainer.email}
+                                </div>
+                              </div>
+                            </div>
+                          </button>
+                        ))
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
 
