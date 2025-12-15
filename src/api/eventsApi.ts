@@ -41,3 +41,8 @@ export const cancelEvent = async (eventId: string): Promise<ApiResponse<Event>> 
   });
   return response.data;
 };
+
+export const updateEvent = async (eventId: string, eventData: Partial<Event>): Promise<ApiResponse<Event>> => {
+  const response = await api.put<ApiResponse<Event>>(`/api/events/${eventId}`, eventData);
+  return response.data;
+};

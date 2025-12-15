@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar, Plus, Upload } from 'lucide-react';
 import { useEventsQuery } from '../hooks/queries/useEventQueries';
-import { EventFilters as EventFiltersType, EventQueryParams } from '../types/event';
+import { EventFilters as EventFiltersType, EventQueryParams, Event } from '../types/event';
 import EventFilters from '../components/events/EventFilters';
 import EventsTable from '../components/events/EventsTable';
 import BulkUploadModal from '../components/events/BulkUploadModal';
+import EditEventModal from '../components/events/EditEventModal';
 import { useCenter } from '../contexts/CenterContext';
 import useAuth from '../hooks/useAuth';
 
@@ -12,6 +13,7 @@ const EventsPage: React.FC = () => {
   const { user } = useAuth();
   const { selectedCenterId } = useCenter();
   const [showBulkUploadModal, setShowBulkUploadModal] = useState(false);
+  const [eventToEdit, setEventToEdit] = useState<Event | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize] = useState(10);
   const [filters, setFilters] = useState<EventFiltersType>({});
@@ -45,6 +47,14 @@ const EventsPage: React.FC = () => {
 
   const handleClearFilters = () => {
     setFilters({});
+  };
+
+  const handleEditEvent = (event: Event) => {
+    setEventToEdit(event);
+  };
+
+  const handleCloseEditModal = () => {
+    setEventToEdit(null);
   };
 
   return (
@@ -136,6 +146,7 @@ const EventsPage: React.FC = () => {
         <EventsTable
           data={eventsData?.data || []}
           isLoading={eventsLoading}
+          onEdit={!isCenterAdmin ? handleEditEvent : undefined}
         />
       )}
 
@@ -208,6 +219,13 @@ const EventsPage: React.FC = () => {
       <BulkUploadModal
         isOpen={showBulkUploadModal}
         onClose={() => setShowBulkUploadModal(false)}
+      />
+
+      {/* Edit Event Modal */}
+      <EditEventModal
+        event={eventToEdit}
+        isOpen={!!eventToEdit}
+        onClose={handleCloseEditModal}
       />
     </div>
   );

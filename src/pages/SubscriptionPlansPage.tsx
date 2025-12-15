@@ -420,7 +420,6 @@ const SubscriptionPlansPage: React.FC = () => {
         onClose={() => setPlanToDelete(null)}
         onConfirm={handleConfirmDelete}
         title="Delete Subscription Plan"
-        message={`Are you sure you want to delete the subscription plan "${planToDelete?.name}"?\n\nThis action cannot be undone and will remove the plan from your society's offerings.`}
         message={`Are you sure you want to delete the subscription plan "${planToDelete?.name}"?\n\nThis action cannot be undone and will remove the plan from your center's offerings.`}
         confirmText="Delete Plan"
         cancelText="Keep Plan"
