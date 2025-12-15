@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Event } from '../../types/event';
 import { X, Calendar, Clock, Users, MapPin, Search } from 'lucide-react';
 import { useUpdateEventMutation } from '../../hooks/queries/useEventQueries';
@@ -36,18 +36,6 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ event, isOpen, onClose 
   const [muscleGroupInput, setMuscleGroupInput] = useState('');
   const [trainerSearchQuery, setTrainerSearchQuery] = useState('');
   const [showTrainerDropdown, setShowTrainerDropdown] = useState(false);
-
-  const filteredTrainers = useMemo(() => {
-    if (!trainersData?.data) return [];
-
-    if (!trainerSearchQuery) return trainersData.data;
-
-    const query = trainerSearchQuery.toLowerCase();
-    return trainersData.data.filter(trainer =>
-      `${trainer.first_name} ${trainer.last_name}`.toLowerCase().includes(query) ||
-      trainer.email.toLowerCase().includes(query)
-    );
-  }, [trainersData, trainerSearchQuery]);
 
   useEffect(() => {
     if (event) {
@@ -201,12 +189,12 @@ const EditEventModal: React.FC<EditEventModalProps> = ({ event, isOpen, onClose 
                         <div className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">
                           Loading trainers...
                         </div>
-                      ) : filteredTrainers.length === 0 ? (
+                      ) : !trainersData?.data || trainersData.data.length === 0 ? (
                         <div className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">
                           No trainers found
                         </div>
                       ) : (
-                        filteredTrainers.map((trainer) => (
+                        trainersData.data.map((trainer) => (
                           <button
                             key={trainer.user_id}
                             type="button"
