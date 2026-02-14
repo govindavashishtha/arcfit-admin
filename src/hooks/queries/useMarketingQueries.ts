@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getMarketingContent, createMarketingContent } from '../../api/marketingApi';
+import { getMarketingContent, createMarketingContent, deleteMarketingContent } from '../../api/marketingApi';
 import { CreateMarketingContent } from '../../types/marketing';
 
 export const marketingKeys = {
@@ -42,6 +42,26 @@ export const useCreateMarketingMutation = () => {
     },
     onError: (error) => {
       console.error('Create marketing content error:', error);
+    },
+  });
+};
+
+export const useDeleteMarketingMutation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const response = await deleteMarketingContent(id);
+      if (!response.success) {
+        throw new Error('Failed to delete marketing content');
+      }
+      return response;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: marketingKeys.lists() });
+    },
+    onError: (error) => {
+      console.error('Delete marketing content error:', error);
     },
   });
 };

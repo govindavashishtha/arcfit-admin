@@ -22,3 +22,8 @@ export const createMarketingContent = async (data: CreateMarketingContent): Prom
   });
   return response.data;
 };
+
+export const deleteMarketingContent = async (id: string): Promise<{ success: boolean }> => {
+  const response = await api.delete(`/api/marketing/${id}`);
+  return response.data;
+};

@@ -1,14 +1,30 @@
 import React, { useState } from 'react';
-import { useMarketingQuery } from '../hooks/queries/useMarketingQueries';
+import { useMarketingQuery, useDeleteMarketingMutation } from '../hooks/queries/useMarketingQueries';
 import { useCenter } from '../contexts/CenterContext';
-import { Megaphone, Calendar, AlertCircle, Plus } from 'lucide-react';
+import { Megaphone, Calendar, AlertCircle, Plus, Trash2 } from 'lucide-react';
 import { formatDateToIST } from '../utils/dateUtils';
 import CreateMarketingModal from '../components/marketing/CreateMarketingModal';
+import ConfirmationModal from '../components/ui/ConfirmationModal';
+import toast from 'react-hot-toast';
 
 const MarketingPage: React.FC = () => {
   const { selectedCenterId } = useCenter();
   const { data: marketingContent, isLoading, error } = useMarketingQuery(selectedCenterId);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [deleteContentId, setDeleteContentId] = useState<string | null>(null);
+  const deleteMutation = useDeleteMarketingMutation();
+
+  const handleDelete = async () => {
+    if (!deleteContentId) return;
+
+    try {
+      await deleteMutation.mutateAsync(deleteContentId);
+      toast.success('Marketing content deleted successfully!');
+      setDeleteContentId(null);
+    } catch (error: any) {
+      toast.error(error.response?.data?.error || 'Failed to delete marketing content');
+    }
+  };
 
   if (isLoading) {
     return (
@@ -89,6 +105,24 @@ const MarketingPage: React.FC = () => {
 
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
 
+              <div className="absolute top-4 right-4 flex items-center space-x-2">
+                {content.markdown && (
+                  <div className="bg-blue-600 text-white text-xs px-2 py-1 rounded-full">
+                    Details
+                  </div>
+                )}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setDeleteContentId(content.id);
+                  }}
+                  className="p-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors opacity-0 group-hover:opacity-100"
+                  title="Delete content"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
+              </div>
+
               <div className="absolute inset-0 p-6 flex flex-col justify-end">
                 <h3 className="text-xl font-bold text-white mb-2 line-clamp-2">
                   {content.title}
@@ -103,12 +137,6 @@ const MarketingPage: React.FC = () => {
                   {formatDateToIST(content.created_at)}
                 </div>
               </div>
-
-              {content.markdown && (
-                <div className="absolute top-4 right-4 bg-blue-600 text-white text-xs px-2 py-1 rounded-full">
-                  Details
-                </div>
-              )}
             </div>
           ))}
         </div>
@@ -121,6 +149,17 @@ const MarketingPage: React.FC = () => {
           centerId={selectedCenterId}
         />
       )}
+
+      <ConfirmationModal
+        isOpen={!!deleteContentId}
+        onClose={() => setDeleteContentId(null)}
+        onConfirm={handleDelete}
+        title="Delete Marketing Content"
+        message="Are you sure you want to delete this marketing content? This action cannot be undone."
+        confirmText="Delete"
+        confirmButtonClass="bg-red-600 hover:bg-red-700"
+        isLoading={deleteMutation.isPending}
+      />
     </div>
   );
 };
