@@ -1,12 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useMarketingQuery } from '../hooks/queries/useMarketingQueries';
 import { useCenter } from '../contexts/CenterContext';
-import { Megaphone, Calendar, AlertCircle } from 'lucide-react';
+import { Megaphone, Calendar, AlertCircle, Plus } from 'lucide-react';
 import { formatDateToIST } from '../utils/dateUtils';
+import CreateMarketingModal from '../components/marketing/CreateMarketingModal';
 
 const MarketingPage: React.FC = () => {
   const { selectedCenterId } = useCenter();
   const { data: marketingContent, isLoading, error } = useMarketingQuery(selectedCenterId);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   if (isLoading) {
     return (
@@ -52,6 +54,15 @@ const MarketingPage: React.FC = () => {
             </p>
           </div>
         </div>
+        {selectedCenterId && (
+          <button
+            onClick={() => setIsCreateModalOpen(true)}
+            className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            <Plus className="h-5 w-5" />
+            <span>Create Content</span>
+          </button>
+        )}
       </div>
 
       {!marketingContent || marketingContent.length === 0 ? (
@@ -101,6 +112,14 @@ const MarketingPage: React.FC = () => {
             </div>
           ))}
         </div>
+      )}
+
+      {selectedCenterId && (
+        <CreateMarketingModal
+          isOpen={isCreateModalOpen}
+          onClose={() => setIsCreateModalOpen(false)}
+          centerId={selectedCenterId}
+        />
       )}
     </div>
   );

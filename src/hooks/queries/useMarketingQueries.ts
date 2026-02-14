@@ -1,5 +1,6 @@
-import { useQuery } from '@tanstack/react-query';
-import { getMarketingContent } from '../../api/marketingApi';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { getMarketingContent, createMarketingContent } from '../../api/marketingApi';
+import { CreateMarketingContent } from '../../types/marketing';
 
 export const marketingKeys = {
   all: ['marketing'] as const,
@@ -22,5 +23,25 @@ export const useMarketingQuery = (societyId: string | null) => {
     },
     enabled: !!societyId,
     staleTime: 5 * 60 * 1000,
+  });
+};
+
+export const useCreateMarketingMutation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (data: CreateMarketingContent) => {
+      const response = await createMarketingContent(data);
+      if (!response.success) {
+        throw new Error('Failed to create marketing content');
+      }
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: marketingKeys.lists() });
+    },
+    onError: (error) => {
+      console.error('Create marketing content error:', error);
+    },
   });
 };
