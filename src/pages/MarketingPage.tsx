@@ -105,7 +105,7 @@ const MarketingPage: React.FC = () => {
 
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
 
-              <div className="absolute top-4 right-4 flex items-center space-x-2">
+              <div className="absolute top-4 right-4 flex items-center space-x-2 z-20">
                 {content.markdown && (
                   <div className="bg-blue-600 text-white text-xs px-2 py-1 rounded-full">
                     Details
@@ -116,14 +116,14 @@ const MarketingPage: React.FC = () => {
                     e.stopPropagation();
                     setDeleteContentId(content.id);
                   }}
-                  className="p-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors opacity-0 group-hover:opacity-100"
+                  className="p-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors opacity-0 group-hover:opacity-100 shadow-lg"
                   title="Delete content"
                 >
                   <Trash2 className="h-4 w-4" />
                 </button>
               </div>
 
-              <div className="absolute inset-0 p-6 flex flex-col justify-end">
+              <div className="absolute inset-0 p-6 flex flex-col justify-end pointer-events-none z-10">
                 <h3 className="text-xl font-bold text-white mb-2 line-clamp-2">
                   {content.title}
                 </h3>
