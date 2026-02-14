@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import { Users, UserCheck, Building, LayoutDashboard, CreditCard, Calendar, FileText, Tag, Menu, X, LogOut, Upload } from 'lucide-react';
+import { Users, UserCheck, Building, LayoutDashboard, CreditCard, Calendar, FileText, Tag, Menu, X, LogOut, Upload, Megaphone } from 'lucide-react';
 import useAuth from '../../hooks/useAuth';
 import SocietySelector from './SocietySelector';
 
@@ -79,6 +79,12 @@ const Sidebar: React.FC<SidebarProps> = ({ isMobile }) => {
       path: '/center',
       icon: <Building className="w-5 h-5" />,
       roles: ['admin', 'super_admin'], // Only for admins
+    },
+    {
+      name: 'Marketing',
+      path: '/marketing',
+      icon: <Megaphone className="w-5 h-5" />,
+      roles: ['admin', 'super_admin', 'center_admin'], // Available for center admins
     },
   ];
   
