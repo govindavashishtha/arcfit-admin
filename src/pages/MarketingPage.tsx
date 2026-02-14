@@ -151,13 +151,13 @@ const MarketingPage: React.FC = () => {
       )}
 
       <ConfirmationModal
-        isOpen={!!deleteContentId}
+        open={!!deleteContentId}
         onClose={() => setDeleteContentId(null)}
         onConfirm={handleDelete}
         title="Delete Marketing Content"
         message="Are you sure you want to delete this marketing content? This action cannot be undone."
         confirmText="Delete"
-        confirmButtonClass="bg-red-600 hover:bg-red-700"
+        confirmColor="error"
         isLoading={deleteMutation.isPending}
       />
     </div>
